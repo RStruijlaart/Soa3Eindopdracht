@@ -10,23 +10,13 @@ public class EmailNotification : INotificationObserver
 {
     private EmailService emailService = new();
 
-    public string SendNotification(string body, string subject, List<ProjectMember> projectMemeber)
+    public string SendNotification(string body, string subject, ProjectMember member)
     {
-        StringBuilder sb = new StringBuilder("Succesfully send email notifications to the following members: ");
-        int counter = 1;
-        foreach (ProjectMember member in projectMemeber)
+        bool sendMail = emailService.SendEmail(body, subject, member.User.Email);
+        if (sendMail)
         {
-            bool sendMail = emailService.SendEmail(body, subject, member.User.Email);
-            if (sendMail)
-            {
-                sb.Append($"{member.User.Name}");
-                if (counter != projectMemeber.Count())
-                {
-                    sb.Append(", ");
-                }
-            }
-            counter++;
+            return $"Succesfully send email notifications to: {member.User.Name}";
         }
-        return sb.ToString();
+        return $"Something went wrong sending email notification to: {member.User.Name}";
     }
 }

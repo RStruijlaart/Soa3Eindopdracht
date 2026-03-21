@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 namespace Soa3Eindopdracht.Domain.Notification;
 public interface INotificationObserver
 {
-    public string SendNotification(string body, string subject, List<ProjectMember> projectMemeber);
+    public string SendNotification(string body, string subject, ProjectMember member);
 }

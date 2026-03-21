@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Soa3Eindopdracht.Domain.Notification;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Soa3Eindopdracht.Domain;
-public class ProjectMember
+public class ProjectMember : NotificationObservable
 {
     public User User { get; set; }
     public RoleEnum Role { get; set; }
@@ -13,5 +14,10 @@ public class ProjectMember
     {
         User = user;
         Role = role;
+    }
+
+    public void SendNotification(string body, string subject)
+    {
+        this.SendNotification(body, subject, this);
     }
 }

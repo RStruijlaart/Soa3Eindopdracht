@@ -19,11 +19,11 @@ public abstract class NotificationObservable
         channels.Remove(observer);
     }
 
-    public void SendNotification(string body, string subject, List<ProjectMember> recipients)
+    protected void SendNotification(string body, string subject, ProjectMember recipient)
     {
         foreach (var channel in channels)
         {
-            channel.SendNotification(body, subject, recipients);
+            channel.SendNotification(body, subject, recipient);
         }
     }
 }
