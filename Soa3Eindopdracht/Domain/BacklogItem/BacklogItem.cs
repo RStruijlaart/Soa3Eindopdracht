@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Soa3Eindopdracht.Domain;
+namespace Soa3Eindopdracht.Domain.BacklogItem;
 public class BacklogItem
 {
     public string Name { get; set; }
     public string Description { get; set; }
     public string? ProjectMember { get; set; }
+    public IBacklogItemState state { get; set; }
     public List<Comment.Comment> comments = [];
     private List<Activity> activities = [];
 
