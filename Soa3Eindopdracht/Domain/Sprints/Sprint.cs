@@ -1,7 +1,6 @@
 ﻿using Soa3Eindopdracht.Domain.Pipelines;
 using Soa3Eindopdracht.Domain.Sprints.States;
 using System;
-using Soa3Eindopdracht.Domain.Pipelines;
 using Soa3Eindopdracht.Domain.Reports;
 
 namespace Soa3Eindopdracht.Domain.Sprints
@@ -11,6 +10,7 @@ namespace Soa3Eindopdracht.Domain.Sprints
         public string Name { get; private set; }
         public DateTime StartDate { get; private set; }
         public DateTime EndDate { get; private set; }
+        public Backlog Backlog { get; private set; } = new();
 
         public ISprintState CurrentState { get; set; }
 

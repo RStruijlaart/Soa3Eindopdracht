@@ -8,6 +8,7 @@ namespace Soa3Eindopdracht.Domain.Projects
     public class Project
     {
         public string Name { get; private set; }
+        public Backlog Backlog { get; private set; } = new();
 
         private readonly List<Sprint> _sprints = new();
         public IReadOnlyList<Sprint> Sprints => _sprints;
