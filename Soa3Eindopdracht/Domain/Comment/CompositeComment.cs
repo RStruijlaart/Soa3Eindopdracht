@@ -8,7 +8,7 @@ namespace Soa3Eindopdracht.Domain.Comment;
 public abstract class CompositeComment : Comment
 {
     private List<Comment> children = [];
-    protected CompositeComment(string body, ProjectMember author) : base(body, author)
+    protected CompositeComment(string body, ProjectMember author, BacklogItem.BacklogItem backlogItem) : base(body, author, backlogItem)
     {
     }
 

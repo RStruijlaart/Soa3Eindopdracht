@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Soa3Eindopdracht.Domain.Comment;
 public class SimpleComment : Comment
 {
-    public SimpleComment(string body, ProjectMember author) : base(body, author)
+    public SimpleComment(string body, ProjectMember author, BacklogItem.BacklogItem backlogItem) : base(body, author, backlogItem)
     {
     }
 }

@@ -2,6 +2,7 @@
 using Soa3Eindopdracht.Domain.Sprints.States;
 using System;
 using Soa3Eindopdracht.Domain.Reports;
+using Soa3Eindopdracht.Domain.Projects;
 
 namespace Soa3Eindopdracht.Domain.Sprints
 {
@@ -10,7 +11,8 @@ namespace Soa3Eindopdracht.Domain.Sprints
         public string Name { get; private set; }
         public DateTime StartDate { get; private set; }
         public DateTime EndDate { get; private set; }
-        public Backlog Backlog { get; private set; } = new();
+        public IBacklog Backlog { get; private set; }
+        public Project Project { get; private set; }
 
         public ISprintState CurrentState { get; set; }
 
@@ -19,14 +21,16 @@ namespace Soa3Eindopdracht.Domain.Sprints
         // 🔥 Belangrijk voor later (pipeline)
         public bool HasPipeline { get; protected set; }
 
-        protected Sprint(string name, DateTime start, DateTime end)
+        protected Sprint(string name, DateTime start, DateTime end, Project project)
         {
             ValidateDates(start, end);
 
             Name = name;
             StartDate = start;
             EndDate = end;
+            Project = project;
 
+            Backlog = new SprintBacklog(this);
             CurrentState = new CreatedState(this);
         }
 

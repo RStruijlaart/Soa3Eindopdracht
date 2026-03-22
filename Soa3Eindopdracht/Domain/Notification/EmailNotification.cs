@@ -10,13 +10,16 @@ public class EmailNotification : INotificationObserver
 {
     private EmailService emailService = new();
 
-    public string SendNotification(string body, string subject, ProjectMember member)
+    public void SendNotification(string body, string subject, ProjectMember member)
     {
         bool sendMail = emailService.SendEmail(body, subject, member.User.Email);
         if (sendMail)
         {
-            return $"Succesfully send email notifications to: {member.User.Name}";
+            Console.WriteLine($"Succesfully send email notification to: {member.User.Name}");
         }
-        return $"Something went wrong sending email notification to: {member.User.Name}";
+        else
+        {
+            Console.WriteLine($"Something went wrong sending email notification to: {member.User.Name}");
+        }
     }
 }

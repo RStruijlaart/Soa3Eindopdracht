@@ -10,13 +10,16 @@ public class SmsNotification : INotificationObserver
 {
     private SmsService smsService = new();
 
-    public string SendNotification(string body, string subject, ProjectMember member)
+    public void SendNotification(string body, string subject, ProjectMember member)
     {
         bool sendMail = smsService.SendSms(body, subject, member.User.PhoneNumber);
         if (sendMail)
         {
-            return $"Succesfully send sms notifications to: {member.User.Name}";
+            Console.WriteLine($"Succesfully send sms notification to: {member.User.Name}");
         }
-        return $"Something went wrong sending sms notification to: {member.User.Name}";
+        else
+        {
+            Console.WriteLine($"Something went wrong sending sms notification to: {member.User.Name}");
+        }
     }
 }
