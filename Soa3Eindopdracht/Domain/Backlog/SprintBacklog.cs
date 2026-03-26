@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Soa3Eindopdracht.Domain;
+namespace Soa3Eindopdracht.Domain.Backlog;
 public class SprintBacklog : IBacklog
 {
     public List<BacklogItem.BacklogItem> backlogItems = [];
@@ -13,7 +13,7 @@ public class SprintBacklog : IBacklog
 
     public SprintBacklog(Sprint sprint)
     {
-        this.Sprint = sprint;
+        Sprint = sprint;
     }
 
     public void orderItems()
