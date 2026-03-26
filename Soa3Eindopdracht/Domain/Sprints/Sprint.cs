@@ -58,7 +58,7 @@ namespace Soa3Eindopdracht.Domain.Sprints
         // DOMAIN LOGIC
         // ======================
 
-        protected void UpdateInternal(string name, DateTime start, DateTime end)
+        public void UpdateInternal(string name, DateTime start, DateTime end)
         {
             Name = name;
             StartDate = start;
