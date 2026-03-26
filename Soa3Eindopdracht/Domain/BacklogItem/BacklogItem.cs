@@ -13,7 +13,7 @@ public class BacklogItem
     public string Description { get; private set; }
     public ProjectMember? ProjectMember { get; set; }
     public IBacklog Backlog {  get; set; }
-    public IBacklogItemState state { get; set; } = new TodoState();
+    private IBacklogItemState state { get; set; }
     public List<Comment.Comment> comments = [];
     public List<Activity> activities = [];
 
@@ -22,6 +22,7 @@ public class BacklogItem
         Name = name;
         Description = description;
         Backlog = backlog;
+        state = new TodoState(this);
     }
 
     public void AddActivity(Activity activity)
@@ -77,5 +78,40 @@ public class BacklogItem
             ProjectBacklog sprintBacklog => sprintBacklog.Project,
             _ => null
         };
+    }
+
+    public void SetState(IBacklogItemState state)
+    {
+        this.state = state;
+    }
+
+    public void SetDoing()
+    {
+        this.state.SetDoing();
+    }
+
+    public void SetDone()
+    {
+        this.state.SetDone();
+    }
+
+    public void SetReadyForTesting()
+    {
+        this.state.SetReadyForTesting();
+    }
+
+    public void SetTested()
+    {
+        this.state.SetTested();
+    }
+
+    public void SetTesting()
+    {
+        this.state.SetTesting();
+    }
+
+    public void setTodo()
+    {
+        this.state.setTodo();
     }
 }
