@@ -1,4 +1,5 @@
-﻿using Soa3Eindopdracht.Domain.Comment;
+﻿using Soa3Eindopdracht.Domain.Backlog;
+using Soa3Eindopdracht.Domain.Comment;
 using Soa3Eindopdracht.Domain.Projects;
 using System;
 using System.Collections.Generic;

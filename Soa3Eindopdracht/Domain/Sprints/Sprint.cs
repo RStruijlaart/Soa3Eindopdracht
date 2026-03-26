@@ -3,6 +3,7 @@ using Soa3Eindopdracht.Domain.Sprints.States;
 using System;
 using Soa3Eindopdracht.Domain.Reports;
 using Soa3Eindopdracht.Domain.Projects;
+using Soa3Eindopdracht.Domain.Backlog;
 
 namespace Soa3Eindopdracht.Domain.Sprints
 {
