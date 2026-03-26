@@ -7,33 +7,42 @@ using System.Threading.Tasks;
 namespace Soa3Eindopdracht.Domain.BacklogItem;
 public class DoneState : IBacklogItemState
 {
+    private readonly BacklogItem backlogItem;
+
+    public DoneState(BacklogItem backlogItem)
+    {
+        this.backlogItem = backlogItem;
+    }
+
     public void SetDoing()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Done\" gehaalt worden");
     }
 
     public void SetDone()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Done\" gehaalt worden");
     }
 
     public void SetReadyForTesting()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Done\" gehaalt worden");
     }
 
     public void SetTested()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Done\" gehaalt worden");
     }
 
     public void SetTesting()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Done\" gehaalt worden");
     }
 
     public void setTodo()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Done\" gehaalt worden");
     }
+
+    private void Invalid(string message) => Console.WriteLine($"Fout: {message}");
 }

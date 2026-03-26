@@ -7,33 +7,44 @@ using System.Threading.Tasks;
 namespace Soa3Eindopdracht.Domain.BacklogItem;
 public class TestingState : IBacklogItemState
 {
+    private readonly BacklogItem backlogItem;
+
+    public TestingState(BacklogItem backlogItem)
+    {
+        this.backlogItem = backlogItem;
+    }
     public void SetDoing()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Testing\" naar \"Doing\" gezet worden");
     }
 
     public void SetDone()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Testing\" naar \"Done\" gezet worden");
     }
 
     public void SetReadyForTesting()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item kan niet van \"Testing\" naar \"Ready for Testing\" gezet worden");
     }
 
     public void SetTested()
     {
-        throw new NotImplementedException();
+        this.backlogItem.SetState(new TestedState(backlogItem));
+        this.backlogItem.SendNotificationToScumMaster();
+        Console.WriteLine($"Backlog item: {backlogItem.Name} is naar \"Tested\" gezet");
     }
 
     public void SetTesting()
     {
-        throw new NotImplementedException();
+        Invalid("Backlog item staat al op \"Testing\"");
     }
 
     public void setTodo()
     {
-        throw new NotImplementedException();
+        this.backlogItem.SetState(new TodoState(backlogItem));
+        Console.WriteLine($"Backlog item: {backlogItem.Name} is naar \"Todo\" gezet");
     }
+
+    private void Invalid(string message) => Console.WriteLine($"Fout: {message}");
 }
