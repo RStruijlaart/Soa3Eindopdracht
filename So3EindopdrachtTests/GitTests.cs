@@ -78,5 +78,15 @@ namespace So3EindopdrachtTests
         {
             Assert.Throws<ArgumentException>(() => new Branch(""));
         }
+        [Fact]
+        public void Repository_CanContainMultipleBranches()
+        {
+            var repo = new GitRepository();
+
+            var b1 = repo.CreateBranch("main");
+            var b2 = repo.CreateBranch("dev");
+
+            Assert.Equal(2, repo.Branches.Count);
+        }
     }
 }
