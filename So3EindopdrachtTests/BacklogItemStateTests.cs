@@ -3,9 +3,13 @@ namespace So3EindopdrachtTests
     public class BacklogItemStateTests
     {
         [Fact]
-        public void Test1()
+        public void BacklogItemStateChange_FromTodoToTodo()
         {
+            //Arrange
 
+            //Act
+
+            //Assert
         }
     }
 }
