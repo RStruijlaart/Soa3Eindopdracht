@@ -23,8 +23,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromCreated_ToActive()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
 
@@ -34,8 +33,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromCreated_ToCancelled()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Cancel();
 
@@ -45,8 +43,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromCreated_ToClosed_Invalid()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Close();
 
@@ -60,8 +57,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromActive_ToActive_Invalid()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Start();
@@ -72,8 +68,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromActive_ToFinished()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Finish();
@@ -84,13 +79,23 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromActive_ToCancelled()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Cancel();
 
             Assert.IsType<CancelledState>(sprint.CurrentState);
+        }
+
+        [Fact]
+        public void Sprint_FromActive_ToClosed_Invalid()
+        {
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
+
+            sprint.Start();
+            sprint.Close();
+
+            Assert.IsNotType<ClosedState>(sprint.CurrentState);
         }
 
         // ========================
@@ -100,8 +105,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromFinished_ToFinished_Invalid()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Finish();
@@ -113,8 +117,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Sprint_FromFinished_ToActive_Invalid()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Finish();
@@ -123,15 +126,22 @@ namespace So3EindopdrachtTests
             Assert.IsType<FinishedState>(sprint.CurrentState);
         }
 
-        // ========================
-        // CANCELLED STATE
-        // ========================
+        [Fact]
+        public void Sprint_FromFinished_ToCancelled()
+        {
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
+
+            sprint.Start();
+            sprint.Finish();
+            sprint.Cancel();
+
+            Assert.IsType<CancelledState>(sprint.CurrentState);
+        }
 
         [Fact]
         public void Sprint_FromCancelled_NoTransitionsPossible()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Cancel();
 
@@ -149,8 +159,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReviewSprint_Finished_ToClosed()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Finish();
@@ -162,8 +171,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReviewSprint_Close_Invalid_BeforeFinished()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Close();
@@ -174,8 +182,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReviewSprint_StartPipeline_Invalid()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Finish();
@@ -191,8 +198,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReleaseSprint_Pipeline_Success()
         {
-            var project = CreateProject();
-            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             var pipelineMock = new Mock<IPipelineComponent>();
             sprint.SetPipeline(pipelineMock.Object);
@@ -208,8 +214,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReleaseSprint_Pipeline_NoPipeline()
         {
-            var project = CreateProject();
-            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             sprint.Start();
             sprint.Finish();
@@ -221,8 +226,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReleaseSprint_Pipeline_BeforeFinish_Invalid()
         {
-            var project = CreateProject();
-            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             var pipelineMock = new Mock<IPipelineComponent>();
             sprint.SetPipeline(pipelineMock.Object);
@@ -236,8 +240,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReleaseSprint_Released_ToClosed()
         {
-            var project = CreateProject();
-            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             var pipelineMock = new Mock<IPipelineComponent>();
             sprint.SetPipeline(pipelineMock.Object);
@@ -253,8 +256,7 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReleaseSprint_Released_StartPipeline_Again_Invalid()
         {
-            var project = CreateProject();
-            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
+            var sprint = new ReleaseSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
 
             var pipelineMock = new Mock<IPipelineComponent>();
             sprint.SetPipeline(pipelineMock.Object);
@@ -266,6 +268,21 @@ namespace So3EindopdrachtTests
 
             Assert.IsType<ReleasedState>(sprint.CurrentState);
             pipelineMock.Verify(p => p.Execute(), Times.Once);
+        }
+
+        [Fact]
+        public void Sprint_FromClosed_NoTransitionsPossible()
+        {
+            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), CreateProject());
+
+            sprint.Start();
+            sprint.Finish();
+            sprint.Close();
+
+            sprint.Start();
+            sprint.Cancel();
+
+            Assert.IsType<ClosedState>(sprint.CurrentState);
         }
     }
 }
