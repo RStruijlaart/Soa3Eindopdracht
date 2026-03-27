@@ -115,4 +115,6 @@ public class BacklogItem
     {
         this.state.setTodo();
     }
+
+    public IBacklogItemState CurrentState => state;
 }

@@ -25,6 +25,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item staat al op \"Todo\" naar \"Todo\"", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -46,6 +47,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is nu in \"Doing\" gezet", output);
+            Assert.IsType<DoingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -67,6 +69,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: BacklogItem kan niet van \"Todo\" naar \"Done\" gezet worden", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -88,6 +91,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Todo\" naar \"Ready for Testing\" gezet worden", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -109,6 +113,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Todo\" naar \"Testing\" gezet worden", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -130,6 +135,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Todo\" naar \"Tested\" gezet worden", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -154,6 +160,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: BacklogItem staat al op \"Doing\" naar \"Doing\"", output);
+            Assert.IsType<DoingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -178,6 +185,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: BacklogItem kan niet van \"Doing\" naar \"Done\" gezet worden", output);
+            Assert.IsType<DoingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -202,6 +210,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Ready for Testing\" gezet", output);
+            Assert.IsType<ReadyForTestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -226,6 +235,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: BacklogItem kan niet van \"Doing\" naar \"Testing\" gezet worden", output);
+            Assert.IsType<DoingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -250,6 +260,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: BacklogItem kan niet van \"Doing\" naar \"Tested\" gezet worden", output);
+            Assert.IsType<DoingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -274,6 +285,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Todo\" gezet", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -299,6 +311,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Doing\" gezet", output);
+            Assert.IsType<DoingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -324,6 +337,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Ready for Testing\" naar \"Done\" gezet worden", output);
+            Assert.IsType<ReadyForTestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -349,6 +363,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item staat al op \"Ready for Testing\"", output);
+            Assert.IsType<ReadyForTestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -374,6 +389,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Testing\" gezet", output);
+            Assert.IsType<TestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -399,6 +415,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Ready for Testing\" naar \"Tested\" gezet worden", output);
+            Assert.IsType<ReadyForTestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -424,6 +441,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Ready for Testing\" naar \"Todo\" gezet worden", output);
+            Assert.IsType<ReadyForTestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -450,6 +468,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Testing\" naar \"Doing\" gezet worden", output);
+            Assert.IsType<TestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -476,6 +495,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Testing\" naar \"Done\" gezet worden", output);
+            Assert.IsType<TestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -502,6 +522,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Testing\" naar \"Ready for Testing\" gezet worden", output);
+            Assert.IsType<TestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -528,6 +549,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item staat al op \"Testing\"", output);
+            Assert.IsType<TestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -554,6 +576,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Tested\" gezet", output);
+            Assert.IsType<TestedState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -580,6 +603,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Todo\" gezet", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -607,6 +631,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Tested\" naar \"Doing\" gezet worden", output);
+            Assert.IsType<TestedState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -634,6 +659,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Done\" gezet", output);
+            Assert.IsType<DoneState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -661,6 +687,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Ready for Testing\" gezet", output);
+            Assert.IsType<ReadyForTestingState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -688,6 +715,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Tested\" naar \"Testing\" gezet worden", output);
+            Assert.IsType<TestedState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -715,6 +743,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item staat al op \"Tested\"", output);
+            Assert.IsType<TestedState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -742,6 +771,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Backlog item: Test is naar \"Todo\" gezet", output);
+            Assert.IsType<TodoState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -770,6 +800,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Done\" gehaalt worden", output);
+            Assert.IsType<DoneState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -798,6 +829,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Done\" gehaalt worden", output);
+            Assert.IsType<DoneState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -826,6 +858,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Done\" gehaalt worden", output);
+            Assert.IsType<DoneState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -854,6 +887,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Done\" gehaalt worden", output);
+            Assert.IsType<DoneState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -882,6 +916,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Done\" gehaalt worden", output);
+            Assert.IsType<DoneState>(backlogItem.CurrentState);
         }
 
         [Fact]
@@ -910,6 +945,7 @@ namespace So3EindopdrachtTests
             //Assert
             var output = sw.ToString().Trim();
             Assert.Equal("Fout: Backlog item kan niet van \"Done\" gehaalt worden", output);
+            Assert.IsType<DoneState>(backlogItem.CurrentState);
         }
     }
 }
