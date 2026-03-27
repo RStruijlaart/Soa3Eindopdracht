@@ -1,12 +1,13 @@
-﻿using Soa3Eindopdracht.Domain.Reports;
+﻿using Soa3Eindopdracht.Domain.Projects;
+using Soa3Eindopdracht.Domain.Reports;
 using System;
 
 namespace Soa3Eindopdracht.Domain.Sprints
 {
     public class ReviewSprint : Sprint
     {
-        public ReviewSprint(string name, DateTime start, DateTime end)
-            : base(name, start, end)
+        public ReviewSprint(string name, DateTime start, DateTime end, Project project)
+            : base(name, start, end, project)
         {
             HasPipeline = false;
         }
