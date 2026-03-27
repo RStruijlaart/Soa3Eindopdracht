@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Soa3Eindopdracht.Domain.BacklogItem;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,15 @@ namespace Soa3Eindopdracht.Domain.Comment;
 public abstract class CompositeComment : Comment
 {
     private List<Comment> children = [];
-    protected CompositeComment(string body, ProjectMember author, BacklogItem.BacklogItem backlogItem) : base(body, author, backlogItem)
+    private CompositeComment? parent;
+    protected CompositeComment(string body, ProjectMember author, BacklogItem.BacklogItem backlogItem, CompositeComment parent) : base(body, author, backlogItem)
     {
+        this.parent = parent;
+    }
+
+    protected override void SendNotification(List<ProjectMember> recipients)
+    {
+        base.SendNotification(GetParents(this));
     }
 
     public void AddChild(Comment comment)
@@ -25,5 +33,16 @@ public abstract class CompositeComment : Comment
     public List<Comment> GetChildren(Comment comment)
     {
         return children;
+    }
+
+    private List<ProjectMember> GetParents(CompositeComment comment)
+    {
+        List<ProjectMember> parents = [];
+        if (comment.parent != null)
+        {
+            parents.Add(comment.parent.Author);
+            GetParents(comment.parent);
+        }
+        return parents; 
     }
 }

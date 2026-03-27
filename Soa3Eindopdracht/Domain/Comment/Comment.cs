@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,19 +18,40 @@ public abstract class Comment
         this.Body = body;
         this.Author = author;
         this.BacklogItem = backlogItem;
+        SendNotification([]);
     }
 
-    public void SendNotification()
+    protected virtual void SendNotification(List<ProjectMember> recipients)
     {
+        recipients.AddRange(getAuthors());
+        List<ProjectMember> noDupes = recipients.Distinct().ToList();
+
+        foreach (ProjectMember member in noDupes)
+        {
+            member.SendNotification(Body, $"Nieuwe comment voor PBI: {BacklogItem.Name}");
+        }
+    }
+
+    private List<ProjectMember> getAuthors()
+    {
+        List<ProjectMember> authors = [];
         List<Activity> activities = BacklogItem.GetActivities();
         if (activities.Count != 0)
         {
-            foreach (Activity activity in BacklogItem.GetActivities())
+            foreach (Activity activity in activities)
             {
-                activity.ProjectMember?.SendNotification(Body, $"Nieuwe comment voor PBI: {BacklogItem.Name}");
+                if (activity.ProjectMember != null)
+                {
+                    authors.Add(activity.ProjectMember);
+                }
             }
         }
-        BacklogItem.ProjectMember?.SendNotification(Body, $"Nieuwe comment voor PBI: {BacklogItem.Name}");
+        if (BacklogItem.ProjectMember != null)
+        {
+            authors.Add(BacklogItem.ProjectMember);
+        }
+
+        return authors;
     }
 
     public void Operation()

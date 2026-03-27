@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 namespace Soa3Eindopdracht.Domain;
 public class ProjectMember : NotificationObservable
 {
-    public bool Active { get; set; }
     public User User { get; set; }
     public RoleEnum Role { get; set; }
     public ProjectMember(User user, RoleEnum role)
     {
-        Active = true;
         User = user;
         Role = role;
     }
