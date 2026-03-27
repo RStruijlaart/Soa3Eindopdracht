@@ -10,10 +10,12 @@ public class Activity
     public string Name { get; set; }
     public string Description { get; set; }
     public ProjectMember ProjectMember { get; set; }
+    public bool Finished { get; set; }
     public Activity(string name, string description, ProjectMember member)
     {
         Name = name;
         Description = description;
         ProjectMember = member;
+        Finished = false;
     }
 }

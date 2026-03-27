@@ -1,4 +1,5 @@
-﻿using Soa3Eindopdracht.Domain.Comment;
+﻿using Soa3Eindopdracht.Domain.Backlog;
+using Soa3Eindopdracht.Domain.Comment;
 using Soa3Eindopdracht.Domain.Projects;
 using System;
 using System.Collections.Generic;
@@ -51,7 +52,7 @@ public class BacklogItem
 
         foreach (ProjectMember member in projectMembers)
         {
-            member.SendNotification($"Backlog item: {Name} is ready for testing!","Backlog item ready for testing");
+            member.SendNotification($"Backlog item: {Name} is ready for testing!", "Backlog item ready for testing");
         }
     }
 
