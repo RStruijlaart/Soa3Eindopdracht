@@ -52,7 +52,7 @@ public class BacklogItem
 
         foreach (ProjectMember member in projectMembers)
         {
-            member.SendNotification($"Backlog item: {Name} is ready for testing!","Backlog item ready for testing");
+            member.SendNotification($"Backlog item: {Name} is ready for testing!", "Backlog item ready for testing");
         }
     }
 

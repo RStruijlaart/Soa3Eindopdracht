@@ -21,7 +21,7 @@ public abstract class NotificationObservable
 
     protected void SendNotification(string body, string subject, ProjectMember recipient)
     {
-        foreach (var channel in channels)
+        foreach (INotificationObserver channel in channels)
         {
             channel.SendNotification(body, subject, recipient);
         }
