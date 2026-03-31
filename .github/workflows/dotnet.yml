@@ -1,0 +1,79 @@
+name: SonarQube
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    name: Build, Test, and Analyze
+    runs-on: windows-latest
+
+    steps:
+      # 1. Set up Java (required for SonarQube)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
+      # 2. Checkout repository
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 3. Cache SonarQube packages
+      - name: Cache SonarQube Cloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      # 4. Cache Sonar scanner
+      - name: Cache SonarQube Cloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      # 5. Install Sonar scanner if not cached
+      - name: Install SonarQube Cloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
+
+      # 6. Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # 7. Build project
+      - name: Build project
+        run: dotnet build --no-restore
+
+      # 8. Run tests
+      - name: Run unit tests
+        run: dotnet test --no-build --verbosity normal
+
+      # 9. SonarQube analysis
+      - name: Build and analyze with SonarQube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin `
+            /k:"RStruijlaart_Soa3Eindopdracht" `
+            /o:"rstruijlaart" `
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          
+          dotnet build
+
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
