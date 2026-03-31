@@ -18,12 +18,11 @@ public abstract class Comment
         this.Body = body;
         this.Author = author;
         this.BacklogItem = backlogItem;
-        SendNotification([]);
+        SendNotification(getAuthors());
     }
 
     protected virtual void SendNotification(List<ProjectMember> recipients)
     {
-        recipients.AddRange(getAuthors());
         List<ProjectMember> noDupes = recipients.Distinct().ToList();
 
         foreach (ProjectMember member in noDupes)

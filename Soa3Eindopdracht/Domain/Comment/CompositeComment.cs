@@ -10,13 +10,9 @@ public abstract class CompositeComment : Comment
 {
     private List<Comment> children = [];
     private CompositeComment? parent;
-    protected CompositeComment(string body, ProjectMember author, BacklogItem.BacklogItem backlogItem, CompositeComment parent) : base(body, author, backlogItem)
+    protected CompositeComment(string body, ProjectMember author, BacklogItem.BacklogItem backlogItem, CompositeComment? parent) : base(body, author, backlogItem)
     {
         this.parent = parent;
-    }
-
-    protected override void SendNotification(List<ProjectMember> recipients)
-    {
         base.SendNotification(GetParents(this));
     }
 
