@@ -51,7 +51,10 @@ jobs:
           dotnet build --no-incremental
 
           dotnet tool install --tool-path .\.tools JetBrains.dotCover.CommandLineTools
-          dotCover test --dcReportType=HTML
+          .\.tools\dotCover.exe cover `
+          --TargetExecutable="dotnet" `
+          --TargetArguments="test --no-build" `
+          --Output="coverage.dcvr"
 
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
