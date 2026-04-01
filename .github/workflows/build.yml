@@ -51,7 +51,7 @@ jobs:
           dotnet build --no-incremental
 
           dotnet tool install --tool-path .\.tools JetBrains.dotCover.CommandLineTools
-          .\.tools\dotCover.exe analyse /ReportType=HTML /Output="%CD%\dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=UnitTestProject1\bin\Debug\UnitTestProject1.dll"
+          .\.tools\dotCover.exe report /ReportType=HTML /Output="%CD%\dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=UnitTestProject1\bin\Debug\UnitTestProject1.dll"
 
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
