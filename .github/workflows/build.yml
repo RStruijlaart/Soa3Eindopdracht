@@ -42,6 +42,16 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"RStruijlaart_Soa3Eindopdracht" /o:"rstruijlaart" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          dotnet build
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin `
+            /k:"RStruijlaart_Soa3Eindopdracht" `
+            /o:"rstruijlaart" `
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
+            /d:sonar.cs.dotcover.reportsPaths=dotCover.Output.html
+
+          dotnet build --no-incremental
+
+          dotnet tool install --tool-path .\.tools JetBrains.dotCover.CommandLineTools
+          .\.tools\dotCover.exe test --dcReportType=HTML
+
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
