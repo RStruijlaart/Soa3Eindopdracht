@@ -50,8 +50,8 @@ jobs:
 
           dotnet build --no-incremental
 
-          dotnet tool install --tool-path .\.tools JetBrains.dotCover.CommandLineTools
-          .\.tools\dotCover.exe test --dcReportType=HTML
+          dotnet tool install --global JetBrains.dotCover.CommandLineTools
+          dotnet dotcover test --dcReportType=HTML
 
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
             /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
