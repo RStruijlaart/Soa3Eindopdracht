@@ -25,7 +25,7 @@ public abstract class Comment
         SendNotification(getAuthors());
     }
 
-    protected virtual void SendNotification(List<ProjectMember> recipients)
+    protected void SendNotification(List<ProjectMember> recipients)
     {
         List<ProjectMember> noDupes = recipients.Distinct().ToList();
 

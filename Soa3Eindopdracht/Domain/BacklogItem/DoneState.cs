@@ -7,13 +7,6 @@ using System.Threading.Tasks;
 namespace Soa3Eindopdracht.Domain.BacklogItem;
 public class DoneState : IBacklogItemState
 {
-    private readonly BacklogItem backlogItem;
-
-    public DoneState(BacklogItem backlogItem)
-    {
-        this.backlogItem = backlogItem;
-    }
-
     public void SetDoing()
     {
         Invalid("Backlog item kan niet van \"Done\" gehaalt worden");

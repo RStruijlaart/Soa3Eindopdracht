@@ -24,7 +24,7 @@ public class TestedState : IBacklogItemState
     {
         if (this.backlogItem.activities.All(a => a.Finished))
         {
-            this.backlogItem.SetState(new DoneState(backlogItem));
+            this.backlogItem.SetState(new DoneState());
             Console.WriteLine($"Backlog item: {backlogItem.Name} is naar \"Done\" gezet");
         }
         else
