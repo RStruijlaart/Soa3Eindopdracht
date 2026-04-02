@@ -63,7 +63,7 @@ namespace So3EindopdrachtTests
         {
             // Act
             _backlogItem.ProjectMember = _dev1;
-            _backlogItem.ProjectMember = _dev2; // Overschrijft de vorige
+            _backlogItem.ProjectMember = _dev2;
 
             // Assert
             Assert.Equal(_dev2, _backlogItem.ProjectMember);
@@ -89,8 +89,7 @@ namespace So3EindopdrachtTests
             // Act
             _backlogItem.SetDone();
 
-            // Assert: Mag niet in DoneState zijn als activiteit open staat
-            // Let op: als dit faalt, moet je in TestedState.cs de check toevoegen!
+            // Assert
             Assert.NotEqual(typeof(DoneState), _backlogItem.CurrentState.GetType());
         }
 
@@ -146,7 +145,6 @@ namespace So3EindopdrachtTests
             _backlogItem.SetDone();
 
             // Act & Assert
-            // Deze test dwingt af dat je in de Comment constructor checkt op de status.
             Assert.Throws<InvalidOperationException>(() =>
                 new SimpleComment("Dit zou niet moeten kunnen", _dev1, _backlogItem));
         }

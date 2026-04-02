@@ -41,16 +41,14 @@ namespace So3EindopdrachtTests
             // Arrange
             var backlog = new ProjectBacklog(_project);
 
-            using (var sw = new StringWriter())
-            {
-                Console.SetOut(sw);
+            using var sw = new StringWriter();
+            Console.SetOut(sw);
 
-                // Act
-                backlog.orderItems();
+            // Act
+            backlog.orderItems();
 
-                // Assert
-                Assert.Contains("Backlog items have been ordered", sw.ToString());
-            }
+            // Assert
+            Assert.Contains("Backlog items have been ordered", sw.ToString());
         }
 
         // ============================================================

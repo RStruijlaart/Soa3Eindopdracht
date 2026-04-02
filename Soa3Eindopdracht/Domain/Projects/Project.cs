@@ -45,9 +45,8 @@ namespace Soa3Eindopdracht.Domain.Projects
         {
             switch (member.Role)
             {
-                // Project.cs aanpassen:
                 case RoleEnum.SCRUM_MASTER:
-                    if (ScrumMaster == null) // Verander != naar ==
+                    if (ScrumMaster == null)
                     {
                         ScrumMaster = member;
                         Console.WriteLine($"Set {member.User.Name} as Scrum Master!");
@@ -59,7 +58,7 @@ namespace Soa3Eindopdracht.Domain.Projects
                     break;
 
                 case RoleEnum.PRODUCT_OWNER:
-                    if (ProductOwner == null) // Verander != naar ==
+                    if (ProductOwner == null)
                     {
                         ProductOwner = member;
                         Console.WriteLine($"Set {member.User.Name} as Product Owner");

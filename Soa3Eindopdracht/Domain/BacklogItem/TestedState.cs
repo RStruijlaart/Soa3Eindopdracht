@@ -22,8 +22,6 @@ public class TestedState : IBacklogItemState
 
     public void SetDone()
     {
-        // 🔥 NIEUWE CHECK VOOR FR-4.2
-        // We controleren of alle activiteiten in het BacklogItem de status 'Finished' op true hebben staan.
         if (this.backlogItem.activities.All(a => a.Finished))
         {
             this.backlogItem.SetState(new DoneState(backlogItem));

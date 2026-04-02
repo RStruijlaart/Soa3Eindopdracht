@@ -17,7 +17,7 @@ namespace So3EindopdrachtTests
 
         public PipelineTests() : base()
         {
-            // Setup voor integratie tests
+            // Setup
             var user = new User(1, "SM", "123", "sm@test.nl", 1);
             _scrumMaster = new ProjectMember(user, RoleEnum.SCRUM_MASTER);
             _project = new Project("DevOps Project", _scrumMaster);
@@ -93,7 +93,7 @@ namespace So3EindopdrachtTests
 
             // Act
             sprint.Start();
-            sprint.Finish(); // Deze actie triggert in jouw domeincode nu AL de pipeline
+            sprint.Finish();
 
             // Assert
             pipelineMock.Verify(p => p.Execute(), Times.Once);
@@ -110,7 +110,6 @@ namespace So3EindopdrachtTests
             var pipeline = new PipelineComposite();
 
             // Act & Assert
-            // Volgens jouw Sprint.SetPipeline() gooit dit een exception bij ReviewSprints
             Assert.Throws<InvalidOperationException>(() => sprint.SetPipeline(pipeline));
         }
 
@@ -133,7 +132,6 @@ namespace So3EindopdrachtTests
             sprint.Start();
 
             // Act
-            // Omdat Finish() de pipeline direct start, vangen we de exception hier op
             try { sprint.Finish(); } catch { /* Domeincode handelt notificatie af */ }
 
             // Assert

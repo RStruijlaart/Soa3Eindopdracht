@@ -18,8 +18,6 @@ namespace Soa3Eindopdracht.Domain.Sprints
         public ISprintState CurrentState { get; set; }
 
         public IPipelineComponent Pipeline { get; private set; }
-
-        // 🔥 Belangrijk voor later (pipeline)
         public bool HasPipeline { get; protected set; }
 
         protected Sprint(string name, DateTime start, DateTime end, Project project)

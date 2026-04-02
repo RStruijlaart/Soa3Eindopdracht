@@ -9,7 +9,7 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
         void SetActive();
         void SetFinished();
 
-        void StartReleasePipeline(); // 🔥 BELANGRIJK
+        void StartReleasePipeline();
 
         void SetReleased();
         void SetClosed();

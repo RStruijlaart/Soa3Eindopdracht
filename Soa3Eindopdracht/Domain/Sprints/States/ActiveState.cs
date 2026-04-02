@@ -20,19 +20,16 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
         {
             _sprint.CurrentState = new FinishedState(_sprint);
             Console.WriteLine("Sprint is afgerond (Finished).");
-            // 🔥 Automatische trigger
             if (_sprint is ReleaseSprint releaseSprint)
             {
                 _sprint.StartReleasePipeline();
             }
         }
-        // In ActiveState.cs
         public void Finish()
         {
             _sprint.CurrentState = new FinishedState(_sprint);
             Console.WriteLine($"Sprint {_sprint.Name} is afgerond.");
 
-            // 🔥 Automatische trigger
             if (_sprint is ReleaseSprint releaseSprint)
             {
                 _sprint.StartReleasePipeline();

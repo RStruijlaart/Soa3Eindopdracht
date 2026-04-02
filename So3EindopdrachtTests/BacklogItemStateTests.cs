@@ -48,7 +48,10 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Todo_To_Doing_IsLegal()
         {
+            //Act
             _backlogItem.SetDoing();
+
+            //Assert
             Assert.IsType<DoingState>(_backlogItem.CurrentState);
         }
 
@@ -59,11 +62,13 @@ namespace So3EindopdrachtTests
         [InlineData("Done")]
         public void Todo_To_IllegalStates_ShouldStayInTodo(string targetState)
         {
+            //Act
             if (targetState == "ReadyForTesting") _backlogItem.SetReadyForTesting();
             if (targetState == "Testing") _backlogItem.SetTesting();
             if (targetState == "Tested") _backlogItem.SetTested();
             if (targetState == "Done") _backlogItem.SetDone();
 
+            //Assert
             Assert.IsType<TodoState>(_backlogItem.CurrentState);
         }
 
@@ -74,12 +79,14 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Doing_To_ReadyForTesting_IsLegal_AndNotifiesTesters()
         {
+            //Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
 
+            //Act
             Assert.IsType<ReadyForTestingState>(_backlogItem.CurrentState);
 
-            // Verifieer tekst uit BacklogItem.SendNotificationToTesters
+            //Assert
             _notificationMock.Verify(n => n.SendNotification(
                 It.Is<string>(s => s.ToLower().Contains("ready for testing")),
                 It.IsAny<string>(),
@@ -89,8 +96,13 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Doing_To_Todo_IsLegal()
         {
+            //Arrange
             _backlogItem.SetDoing();
+
+            //Act
             _backlogItem.setTodo();
+
+            //Assert
             Assert.IsType<TodoState>(_backlogItem.CurrentState);
         }
 
@@ -100,12 +112,15 @@ namespace So3EindopdrachtTests
         [InlineData("Done")]
         public void Doing_To_IllegalStates_ShouldStayInDoing(string targetState)
         {
+            //Assert
             _backlogItem.SetDoing();
 
+            //Act
             if (targetState == "Testing") _backlogItem.SetTesting();
             if (targetState == "Tested") _backlogItem.SetTested();
             if (targetState == "Done") _backlogItem.SetDone();
 
+            //Assert
             Assert.IsType<DoingState>(_backlogItem.CurrentState);
         }
 
@@ -116,20 +131,28 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReadyForTesting_To_Testing_IsLegal()
         {
+            //Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
+
+            //Act
             _backlogItem.SetTesting();
 
+            //Assert
             Assert.IsType<TestingState>(_backlogItem.CurrentState);
         }
 
         [Fact]
         public void ReadyForTesting_To_Doing_IsLegal()
         {
+            //Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
+
+            //Act
             _backlogItem.SetDoing();
 
+            //Assert
             Assert.IsType<DoingState>(_backlogItem.CurrentState);
         }
 
@@ -140,29 +163,31 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Testing_To_Todo_IsLegal_AndDoesNotAllowDoing()
         {
+            // Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
             _backlogItem.SetTesting();
 
-            // Act: Terug naar Todo (Rejection)
+            // Act
             _backlogItem.setTodo();
 
+            //Assert
             Assert.IsType<TodoState>(_backlogItem.CurrentState);
         }
 
         [Fact]
         public void Testing_To_Tested_IsLegal_AndNotifiesScrumMaster()
         {
+            // Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
             _backlogItem.SetTesting();
 
-            // Act: Succesvol getest
+            //Act
             _backlogItem.SetTested();
 
+            //Assert
             Assert.IsType<TestedState>(_backlogItem.CurrentState);
-
-            // Verifieer tekst uit BacklogItem.SendNotificationToScumMaster (met de typfout 'Scum' uit je domeincode)
             _notificationMock.Verify(n => n.SendNotification(
                 It.Is<string>(s => s.ToLower().Contains("ready for review")),
                 It.IsAny<string>(),
@@ -172,13 +197,15 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Testing_To_Doing_IsIllegal_AccordingToRequirements()
         {
+            // Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
             _backlogItem.SetTesting();
 
-            // Act: Direct naar Doing (Verboden volgens FR-4.4: "Terug naar doing kan niet")
+            // Act
             _backlogItem.SetDoing();
 
+            //Assert
             Assert.IsType<TestingState>(_backlogItem.CurrentState);
         }
 
@@ -189,26 +216,32 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Tested_To_Done_IsLegal()
         {
+            //Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
             _backlogItem.SetTesting();
             _backlogItem.SetTested();
+
+            //Act
             _backlogItem.SetDone();
 
+            //Assert
             Assert.IsType<DoneState>(_backlogItem.CurrentState);
         }
 
         [Fact]
         public void Tested_To_ReadyForTesting_IsLegal_ForReTesting()
         {
+            // Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
             _backlogItem.SetTesting();
             _backlogItem.SetTested();
 
-            // Act: DoD faalt -> Terug naar ReadyForTesting
+            // Act
             _backlogItem.SetReadyForTesting();
 
+            //Assert
             Assert.IsType<ReadyForTestingState>(_backlogItem.CurrentState);
         }
 
@@ -219,17 +252,19 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Done_IsFinal_CannotChangeToAnyOtherState()
         {
+            // Arrange
             _backlogItem.SetDoing();
             _backlogItem.SetReadyForTesting();
             _backlogItem.SetTesting();
             _backlogItem.SetTested();
             _backlogItem.SetDone();
 
-            // Pogingen tot wijziging
+            // Act
             _backlogItem.setTodo();
             _backlogItem.SetDoing();
             _backlogItem.SetTesting();
 
+            // Assert
             Assert.IsType<DoneState>(_backlogItem.CurrentState);
         }
     }

@@ -18,7 +18,6 @@ namespace So3EindopdrachtTests
             report.SetHeader("Bedrijfsnaam");
             report.SetFooter("Pagina 1");
 
-            // We gebruiken een Mock voor de strategy om te kijken of de Export methode wordt aangeroepen
             var strategyMock = new Mock<IReportExportStrategy>();
             report.SetExportStrategy(strategyMock.Object);
 

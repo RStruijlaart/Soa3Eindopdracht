@@ -32,7 +32,7 @@ namespace So3EindopdrachtTests
         }
 
         // ============================================================
-        // 1. TRANSITIE TESTS (Jouw originele logica, maar compacter)
+        // 1. TRANSITIE TESTS
         // ============================================================
 
         [Theory]
@@ -56,7 +56,7 @@ namespace So3EindopdrachtTests
         {
             var sprint = new ReviewSprint("S1", DateTime.Now, DateTime.Now.AddDays(7), _project);
             sprint.Close();
-            Assert.IsType<CreatedState>(sprint.CurrentState); // Blijft in Created
+            Assert.IsType<CreatedState>(sprint.CurrentState);
         }
 
         [Fact]
@@ -64,12 +64,12 @@ namespace So3EindopdrachtTests
         {
             var sprint = new ReviewSprint("S1", DateTime.Now, DateTime.Now.AddDays(7), _project);
             sprint.Cancel();
-            sprint.Start(); // Poging tot start
+            sprint.Start();
             Assert.IsType<CancelledState>(sprint.CurrentState);
         }
 
         // ============================================================
-        // 2. REQUIREMENT TESTS (Nieuwe diepgang)
+        // 2. REQUIREMENT TESTS
         // ============================================================
 
         [Fact]
@@ -81,7 +81,7 @@ namespace So3EindopdrachtTests
             // Act
             sprint.Edit("Hack de naam", DateTime.Now, DateTime.Now.AddDays(20));
 
-            // Assert: Naam mag niet veranderd zijn
+            // Assert
             Assert.Equal("Sprint 1", sprint.Name);
         }
 
@@ -95,7 +95,7 @@ namespace So3EindopdrachtTests
             // Act
             sprint.Cancel();
 
-            // Assert: Beide rollen moeten notificatie krijgen
+            // Assert
             _notificationMock.Verify(n => n.SendNotification(It.Is<string>(s => s.Contains("geannuleerd")), It.IsAny<string>(), _scrumMaster), Times.Once);
             _notificationMock.Verify(n => n.SendNotification(It.Is<string>(s => s.Contains("geannuleerd")), It.IsAny<string>(), _productOwner), Times.Once);
         }
@@ -110,7 +110,7 @@ namespace So3EindopdrachtTests
 
             // Act
             sprint.Start();
-            sprint.Finish(); // Automatische trigger door domeincode
+            sprint.Finish();
 
             // Assert
             pipelineMock.Verify(p => p.Execute(), Times.Once);
@@ -120,8 +120,6 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReviewSprint_ShouldTransitionToClosed_OnlyWithSummary_FR10_1()
         {
-            // OPMERKING: FR-10.1 zegt dat SM een document moet uploaden.
-            // Dit is een perfect voorbeeld van een test die een requirement afdwingt!
             var sprint = new ReviewSprint("Review", DateTime.Now, DateTime.Now.AddDays(7), _project);
             sprint.Start();
             sprint.Finish();

@@ -64,8 +64,6 @@ namespace So3EindopdrachtTests
             project.AddProjectMember(smMember);
 
             // Assert
-            // Let op: Je domeincode heeft hier een bug (if ScrumMaster != null). 
-            // Deze test dwingt af dat de SM ook echt gezet wordt!
             Assert.Equal(smMember, project.ScrumMaster);
         }
 
@@ -81,7 +79,6 @@ namespace So3EindopdrachtTests
             project.AddProjectMember(poMember);
 
             // Assert
-            // Ook hier dwingt de test de correcte werking van de bug in je domeincode af.
             Assert.Equal(poMember, project.ProductOwner);
         }
 
@@ -112,7 +109,7 @@ namespace So3EindopdrachtTests
         {
             // Arrange
             var project = new Project("Test", new ProjectMember(CreateUser(), RoleEnum.DEVELOPER));
-            // We gebruiken een echte ReviewSprint ipv een mock voor een pure domein test
+
             var sprint = new ReviewSprint("Sprint 1", DateTime.Now, DateTime.Now.AddDays(7), project);
 
             // Act

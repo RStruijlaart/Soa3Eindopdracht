@@ -8,7 +8,6 @@ namespace Soa3Eindopdracht.Domain.Git
         public string Message { get; private set; }
         public DateTime Timestamp { get; private set; }
 
-        // 🔥 Link naar sprint (casus!)
         public Sprint Sprint { get; private set; }
 
         public Commit(string message, Sprint sprint)

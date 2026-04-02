@@ -21,7 +21,7 @@ namespace Soa3Eindopdracht.Domain.Sprints
             report.SetHeader("Avans DevOps");
             report.SetFooter($"Datum: {DateTime.Now}");
 
-            report.SetExportStrategy(new PdfExportStrategy()); // kan wisselen!
+            report.SetExportStrategy(new PdfExportStrategy());
 
             report.Export();
 

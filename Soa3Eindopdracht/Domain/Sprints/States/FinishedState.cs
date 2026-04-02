@@ -18,7 +18,6 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
         public void SetActive() => Invalid("Kan niet terug naar Active.");
         public void SetFinished() => Invalid("Sprint is al finished.");
 
-        // PIPELINE LOGICA
         public void StartReleasePipeline()
         {
             if (!_sprint.IsReleaseSprint())

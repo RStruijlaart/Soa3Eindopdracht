@@ -75,13 +75,13 @@ namespace So3EindopdrachtTests
         }
 
         // ============================================================
-        // FR-6.2: COMBINATIES VAN KANALEN (Gouden Standaard Mocks)
+        // FR-6.2: COMBINATIES VAN KANALEN (Standaard Mocks)
         // ============================================================
 
         [Fact]
         public void ProjectMember_ShouldNotifyMultipleObservers_WhenMultipleChannelsAdded_FR6_2()
         {
-            // Arrange - We voegen twee verschillende mocks toe
+            // Arrange
             var emailMock = new Mock<INotificationObserver>();
             var slackMock = new Mock<INotificationObserver>();
 
@@ -91,7 +91,7 @@ namespace So3EindopdrachtTests
             // Act
             _projectMember.SendNotification("Het systeem is klaar", "Update");
 
-            // Assert - Controleer of BEIDE mocks de notificatie hebben ontvangen
+            // Assert
             emailMock.Verify(n => n.SendNotification("Het systeem is klaar", "Update", _projectMember), Times.Once);
             slackMock.Verify(n => n.SendNotification("Het systeem is klaar", "Update", _projectMember), Times.Once);
         }
@@ -102,7 +102,7 @@ namespace So3EindopdrachtTests
             // Arrange
             var mock = new Mock<INotificationObserver>();
             _projectMember.AddObserver(mock.Object);
-            _projectMember.DeleteObserver(mock.Object); // Verwijder observer
+            _projectMember.DeleteObserver(mock.Object);
 
             // Act
             _projectMember.SendNotification("Test", "Test");
