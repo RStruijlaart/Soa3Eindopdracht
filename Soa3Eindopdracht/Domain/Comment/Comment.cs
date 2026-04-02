@@ -15,6 +15,10 @@ public abstract class Comment
     public BacklogItem.BacklogItem BacklogItem { get; set; }
     protected Comment(string body, ProjectMember author, BacklogItem.BacklogItem backlogItem)
     {
+        if (backlogItem.CurrentState is DoneState)
+        {
+            throw new InvalidOperationException("Discussie is gesloten: er kunnen geen reacties meer worden geplaatst bij een item dat op 'Done' staat.");
+        }
         this.Body = body;
         this.Author = author;
         this.BacklogItem = backlogItem;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Soa3Eindopdracht.Domain.BacklogItem;
+
 public class TestedState : IBacklogItemState
 {
     private readonly BacklogItem backlogItem;
@@ -21,8 +22,17 @@ public class TestedState : IBacklogItemState
 
     public void SetDone()
     {
-        this.backlogItem.SetState(new DoneState(backlogItem));
-        Console.WriteLine($"Backlog item: {backlogItem.Name} is naar \"Done\" gezet");
+        // 🔥 NIEUWE CHECK VOOR FR-4.2
+        // We controleren of alle activiteiten in het BacklogItem de status 'Finished' op true hebben staan.
+        if (this.backlogItem.activities.All(a => a.Finished))
+        {
+            this.backlogItem.SetState(new DoneState(backlogItem));
+            Console.WriteLine($"Backlog item: {backlogItem.Name} is naar \"Done\" gezet");
+        }
+        else
+        {
+            Invalid($"Backlog item {backlogItem.Name} kan niet naar \"Done\" omdat niet alle activiteiten zijn afgerond.");
+        }
     }
 
     public void SetReadyForTesting()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Soa3Eindopdracht.Domain.Projects;
+using System;
 
 namespace Soa3Eindopdracht.Domain.Sprints.States
 {
@@ -30,6 +31,25 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
             {
                 Invalid("Geen pipeline gekoppeld.");
                 return;
+            }
+            try
+            {
+                Console.WriteLine("Pipeline wordt uitgevoerd...");
+                _sprint.Pipeline.Execute();
+                SetReleased();
+            }
+            catch (Exception ex)
+            {
+                Project project = _sprint.Project;
+                if (project.ScrumMaster != null)
+                {
+                    project.ScrumMaster.SendNotification(
+                        $"De pipeline voor sprint {_sprint.Name} is gefaald: {ex.Message}",
+                        "Pipeline Failure"
+                    );
+                }
+
+                Console.WriteLine($"Fout: Pipeline uitvoering gefaald. Scrum Master is op de hoogte gesteld.");
             }
 
             Console.WriteLine("Pipeline wordt uitgevoerd...");
@@ -66,7 +86,22 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
         public void SetCancelled()
         {
             _sprint.CurrentState = new CancelledState(_sprint);
-            Console.WriteLine("Release geannuleerd.");
+
+            Project project = _sprint.Project;
+            string message = $"Release voor sprint {_sprint.Name} is geannuleerd.";
+            string subject = "Release Geannuleerd";
+
+            if (project.ProductOwner != null)
+            {
+                project.ProductOwner.SendNotification(message, subject);
+            }
+
+            if (project.ScrumMaster != null)
+            {
+                project.ScrumMaster.SendNotification(message, subject);
+            }
+
+            Console.WriteLine("Release geannuleerd. Product Owner en Scrum Master zijn genotificeerd.");
         }
 
         private void Invalid(string message) => Console.WriteLine($"Fout: {message}");
