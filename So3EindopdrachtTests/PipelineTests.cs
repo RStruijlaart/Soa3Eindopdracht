@@ -80,7 +80,6 @@ namespace So3EindopdrachtTests
         // ============================================================
         // FR-7: SPRINT INTEGRATIE & AUTOMATISERING
         // ============================================================
-
         [Fact]
         public void ReleaseSprint_ShouldAutomaticallyExecutePipeline_WhenFinished_FR7_2()
         {
@@ -94,8 +93,7 @@ namespace So3EindopdrachtTests
 
             // Act
             sprint.Start();
-            sprint.Finish();
-            sprint.StartReleasePipeline(); // In jouw FinishedState.cs triggert dit de execute
+            sprint.Finish(); // Deze actie triggert in jouw domeincode nu AL de pipeline
 
             // Assert
             pipelineMock.Verify(p => p.Execute(), Times.Once);
@@ -123,9 +121,6 @@ namespace So3EindopdrachtTests
         [Fact]
         public void Pipeline_Failure_ShouldNotifyScrumMaster_FR7_3()
         {
-            // OPMERKING: Jouw huidige FinishedState.cs heeft nog geen try-catch rond de execute.
-            // Deze test dwingt af dat we nadenken over wat er gebeurt als de pipeline faalt.
-
             // Arrange
             var start = DateTime.Now;
             var end = start.AddDays(14);
@@ -136,14 +131,12 @@ namespace So3EindopdrachtTests
 
             sprint.SetPipeline(failingPipeline.Object);
             sprint.Start();
-            sprint.Finish();
 
             // Act
-            try { sprint.StartReleasePipeline(); } catch { /* Simulatie van fout */ }
+            // Omdat Finish() de pipeline direct start, vangen we de exception hier op
+            try { sprint.Finish(); } catch { /* Domeincode handelt notificatie af */ }
 
             // Assert
-            // Volgens FR-7.3 moet de SM bericht krijgen bij een fout. 
-            // Hiervoor moet je in de FinishedState.cs een try-catch toevoegen die de SM notificeert.
             _notificationMock.Verify(n => n.SendNotification(
                 It.Is<string>(s => s.Contains("fout") || s.Contains("gefaald") || s.Contains("Failed")),
                 It.IsAny<string>(),

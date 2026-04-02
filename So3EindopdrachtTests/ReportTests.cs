@@ -4,8 +4,12 @@ using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class ReportTests
+    public class ReportTests : BaseTest
     {
+        public ReportTests() : base()
+        {
+        }
+
         [Fact]
         public void Report_ShouldUsePdfStrategy_ToExport_FR8_3()
         {

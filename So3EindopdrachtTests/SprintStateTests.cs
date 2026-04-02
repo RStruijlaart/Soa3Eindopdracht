@@ -9,14 +9,14 @@ using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class SprintStateTests
+    public class SprintStateTests : BaseTest
     {
         private readonly Project _project;
         private readonly ProjectMember _scrumMaster;
         private readonly ProjectMember _productOwner;
         private readonly Mock<INotificationObserver> _notificationMock;
 
-        public SprintStateTests()
+        public SprintStateTests() : base()
         {
             var smUser = new User(1, "SM", "123", "sm@test.nl", 1);
             var poUser = new User(2, "PO", "456", "po@test.nl", 2);
@@ -103,14 +103,16 @@ namespace So3EindopdrachtTests
         [Fact]
         public void ReleaseSprint_Pipeline_ShouldTransitionToReleased_FR7_2()
         {
+            // Arrange
             var sprint = new ReleaseSprint("Release", DateTime.Now, DateTime.Now.AddDays(7), _project);
             var pipelineMock = new Mock<IPipelineComponent>();
             sprint.SetPipeline(pipelineMock.Object);
 
+            // Act
             sprint.Start();
-            sprint.Finish();
-            sprint.StartReleasePipeline();
+            sprint.Finish(); // Automatische trigger door domeincode
 
+            // Assert
             pipelineMock.Verify(p => p.Execute(), Times.Once);
             Assert.IsType<ReleasedState>(sprint.CurrentState);
         }

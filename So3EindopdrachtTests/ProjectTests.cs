@@ -6,8 +6,12 @@ using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class ProjectTests
+    public class ProjectTests : BaseTest
     {
+        public ProjectTests() : base()
+        {
+        }
+
         private User CreateUser(string name = "Tester", int id = 1)
         {
             return new User(id, name, "123", "test@test.com", id);

@@ -8,8 +8,11 @@ using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class CommentTests 
+    public class CommentTests : BaseTest
     {
+        public CommentTests() : base() 
+        {
+        }
         // ========================
         // SIMPLE COMMENT
         // ========================
