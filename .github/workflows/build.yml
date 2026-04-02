@@ -42,14 +42,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin `
-            /k:"RStruijlaart_Soa3Eindopdracht" `
-            /o:"rstruijlaart" `
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
-            /d:sonar.cs.dotcover.reportsPaths=dotCover.Output.html
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"RStruijlaart_Soa3Eindopdracht" /o:"rstruijlaart" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths=coverage.xml
 
           dotnet build --no-incremental
-          
+
           dotnet tool restore
           dotnet coverlet So3EindopdrachtTests\bin\Debug\net8.0\So3EindopdrachtTests.dll --target "dotnet" --targetargs "test So3EindopdrachtTests/So3EindopdrachtTests.csproj --no-build" -f=opencover -o="coverage.xml"
 
