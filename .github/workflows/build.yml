@@ -49,7 +49,8 @@ jobs:
             /d:sonar.cs.dotcover.reportsPaths=dotCover.Output.html
 
           dotnet build --no-incremental
-
+          
+          dotnet tool restore
           dotnet coverlet So3EindopdrachtTests\bin\Debug\net8.0\So3EindopdrachtTests.dll --target "dotnet" --targetargs "test So3EindopdrachtTests/So3EindopdrachtTests.csproj --no-build" -f=opencover -o="coverage.xml"
 
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
