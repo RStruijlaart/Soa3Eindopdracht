@@ -4,54 +4,54 @@ using Soa3Eindopdracht.Domain.BacklogItem;
 using Soa3Eindopdracht.Domain.Comment;
 using Soa3Eindopdracht.Domain.Notification;
 using Soa3Eindopdracht.Domain.Projects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class CommentTests
+    public class CommentTests 
     {
+        // ========================
+        // SIMPLE COMMENT
+        // ========================
+
         [Fact]
-        public void SimpleCommentSendNotification_WithoutActivities_Valid()
+        public void SimpleComment_ShouldNotify_AssignedDeveloper_WhenNoActivities()
         {
             // Arrange
-            User author = new (1, "Author", "0123456789", "test@test.nl", 1);
-            User member1 = new (3, "Member1", "416895231", "test@test.nl", 3);
+            var author = new User(1, "Author", "0123456789", "test@test.nl", 1);
+            var member = new User(2, "Dev", "123", "dev@test.nl", 2);
 
             var authorMember = new ProjectMember(author, RoleEnum.DEVELOPER);
-            var projectMember1 = new ProjectMember(member1, RoleEnum.DEVELOPER);
+            var devMember = new ProjectMember(member, RoleEnum.DEVELOPER);
 
             var emailMock = new Mock<INotificationObserver>();
             var smsMock = new Mock<INotificationObserver>();
 
-            projectMember1.AddObserver(emailMock.Object);
-            projectMember1.AddObserver(smsMock.Object);
+            devMember.AddObserver(emailMock.Object);
+            devMember.AddObserver(smsMock.Object);
 
-            Project project = new ("TestProject", authorMember);
-            ProjectBacklog backlog = new (project);
-            BacklogItem backlogItem = new ("TestBacklogItem", "TestDescription", backlog);
-            backlogItem.ProjectMember = projectMember1;
+            var project = new Project("Test", authorMember);
+            var backlog = new ProjectBacklog(project);
+            var pbi = new BacklogItem("PBI", "Desc", backlog);
+            pbi.ProjectMember = devMember;
 
             // Act
-            SimpleComment simpleComment = new ("CommentBody", authorMember, backlogItem);
+            new SimpleComment("CommentBody", authorMember, pbi);
 
             // Assert
-            emailMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
-            smsMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
+            emailMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {pbi.Name}", devMember), Times.Once);
+            smsMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {pbi.Name}", devMember), Times.Once);
         }
 
         [Fact]
-        public void SimpleCommentSendNotification_WithActivities_Valid()
+        public void SimpleComment_ShouldAlsoNotify_Author_WhenActivitiesExist()
         {
             // Arrange
-            User author = new (1, "Author", "0123456789", "test@test.nl", 1);
-            User member1 = new (3, "Member1", "416895231", "test@test.nl", 3);
+            var author = new User(1, "Author", "0123456789", "test@test.nl", 1);
+            var member = new User(2, "Dev", "123", "dev@test.nl", 2);
 
             var authorMember = new ProjectMember(author, RoleEnum.DEVELOPER);
-            var projectMember1 = new ProjectMember(member1, RoleEnum.DEVELOPER);
+            var devMember = new ProjectMember(member, RoleEnum.DEVELOPER);
 
             var emailMock = new Mock<INotificationObserver>();
             var smsMock = new Mock<INotificationObserver>();
@@ -59,122 +59,154 @@ namespace So3EindopdrachtTests
 
             authorMember.AddObserver(slackMock.Object);
             authorMember.AddObserver(smsMock.Object);
-            projectMember1.AddObserver(emailMock.Object);
-            projectMember1.AddObserver(smsMock.Object);
+            devMember.AddObserver(emailMock.Object);
+            devMember.AddObserver(smsMock.Object);
 
-            Project project = new("TestProject", authorMember);
-            ProjectBacklog backlog = new(project);
-            BacklogItem backlogItem = new("TestBacklogItem", "TestDescription", backlog);
-            Activity activity = new("Activity", "ActivityDescription", authorMember);
+            var project = new Project("Test", authorMember);
+            var backlog = new ProjectBacklog(project);
+            var pbi = new BacklogItem("PBI", "Desc", backlog);
 
-            backlogItem.AddActivity(activity);
-            backlogItem.ProjectMember = projectMember1;
+            var activity = new Activity("Act", "Desc", authorMember);
+            pbi.AddActivity(activity);
+            pbi.ProjectMember = devMember;
 
             // Act
-            SimpleComment simpleComment = new("CommentBody", authorMember, backlogItem);
+            new SimpleComment("CommentBody", authorMember, pbi);
 
             // Assert
-            emailMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
-            smsMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
-            smsMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {backlogItem.Name}", authorMember), Times.Once);
-            slackMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {backlogItem.Name}", authorMember), Times.Once);
+            emailMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {pbi.Name}", devMember), Times.Once);
+            smsMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {pbi.Name}", devMember), Times.Once);
+
+            smsMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {pbi.Name}", authorMember), Times.Once);
+            slackMock.Verify(n => n.SendNotification("CommentBody", $"Nieuwe comment voor PBI: {pbi.Name}", authorMember), Times.Once);
+        }
+
+        // ========================
+        // COMMENT COMPOSITE
+        // ========================
+
+        [Fact]
+        public void CommentComposite_ShouldNotify_AssignedDeveloper_ForEachComment()
+        {
+            // Arrange
+            var author = new User(1, "Author", "0123456789", "test@test.nl", 1);
+            var dev1 = new User(2, "Dev1", "123", "dev@test.nl", 2);
+            var dev2 = new User(3, "Dev2", "123", "dev@test.nl", 3);
+
+            var authorMember = new ProjectMember(author, RoleEnum.DEVELOPER);
+            var member1 = new ProjectMember(dev1, RoleEnum.DEVELOPER);
+            var member2 = new ProjectMember(dev2, RoleEnum.DEVELOPER);
+
+            var emailMock = new Mock<INotificationObserver>();
+            var smsMock = new Mock<INotificationObserver>();
+
+            member2.AddObserver(emailMock.Object);
+            member2.AddObserver(smsMock.Object);
+
+            var project = new Project("Test", authorMember);
+            var backlog = new ProjectBacklog(project);
+            var pbi = new BacklogItem("PBI", "Desc", backlog);
+            pbi.ProjectMember = member2;
+
+            // Act
+            var c1 = new CommentComposite("C1", authorMember, pbi, null);
+            var c2 = new CommentComposite("C2", member1, pbi, c1);
+
+            // Assert
+            emailMock.Verify(n => n.SendNotification("C1", $"Nieuwe comment voor PBI: {pbi.Name}", member2), Times.Once);
+            smsMock.Verify(n => n.SendNotification("C1", $"Nieuwe comment voor PBI: {pbi.Name}", member2), Times.Once);
+
+            emailMock.Verify(n => n.SendNotification("C2", $"Nieuwe comment voor PBI: {pbi.Name}", member2), Times.Once);
+            smsMock.Verify(n => n.SendNotification("C2", $"Nieuwe comment voor PBI: {pbi.Name}", member2), Times.Once);
         }
 
         [Fact]
-        public void CommentCompositeSendNotification_WithoutActivities_Valid()
+        public void CommentComposite_ShouldNotify_ActivityDevelopers_WhenActivitiesExist()
         {
             // Arrange
-            User author = new (1, "Author", "0123456789", "test@test.nl", 1);
-            User member1 = new(2, "Member1", "416895231", "test@test.nl", 2);
-            User member2 = new (3, "Member2", "416895231", "test@test.nl", 3);
+            var author = new User(1, "Author", "0123456789", "test@test.nl", 1);
+            var dev1 = new User(2, "Dev1", "123", "dev@test.nl", 2);
+            var dev2 = new User(3, "Dev2", "123", "dev@test.nl", 3);
 
-            ProjectMember authorMember = new (author, RoleEnum.DEVELOPER);
-            ProjectMember projectMember1 = new(member1, RoleEnum.DEVELOPER);
-            ProjectMember projectMember2 = new (member2, RoleEnum.DEVELOPER);
+            var authorMember = new ProjectMember(author, RoleEnum.DEVELOPER);
+            var member1 = new ProjectMember(dev1, RoleEnum.DEVELOPER);
+            var member2 = new ProjectMember(dev2, RoleEnum.DEVELOPER);
 
-            // 👇 mocks i.p.v. echte notificaties
             var emailMock = new Mock<INotificationObserver>();
-            var smsMock = new Mock<INotificationObserver>();
             var slackMock = new Mock<INotificationObserver>();
 
-            projectMember1.AddObserver(emailMock.Object);
-            projectMember1.AddObserver(slackMock.Object);
-            projectMember2.AddObserver(emailMock.Object);
-            projectMember2.AddObserver(smsMock.Object);
-            authorMember.AddObserver(slackMock.Object);
-            authorMember.AddObserver(smsMock.Object);
+            member1.AddObserver(emailMock.Object);
+            member1.AddObserver(slackMock.Object);
+            member2.AddObserver(emailMock.Object);
 
-            Project project = new ("TestProject", authorMember);
-            ProjectBacklog backlog = new (project);
-            BacklogItem backlogItem = new("TestBacklogItem", "TestDescription", backlog);
-            backlogItem.ProjectMember = projectMember2;
+            var project = new Project("Test", authorMember);
+            var backlog = new ProjectBacklog(project);
+            var pbi = new BacklogItem("PBI", "Desc", backlog);
+
+            var activity = new Activity("Act", "Desc", member1);
+            pbi.AddActivity(activity);
+            pbi.ProjectMember = member2;
 
             // Act
-            CommentComposite CommentComposite1 = new ("CommentBody1", authorMember, backlogItem, null);
-            CommentComposite CommentComposite2 = new("CommentBody2", projectMember1, backlogItem, CommentComposite1);
+            var c1 = new CommentComposite("C1", authorMember, pbi, null);
+            var c2 = new CommentComposite("C2", member1, pbi, c1);
 
             // Assert
-            emailMock.Verify(n => n.SendNotification("CommentBody1", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
-            smsMock.Verify(n => n.SendNotification("CommentBody1", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
+            emailMock.Verify(n => n.SendNotification("C1", $"Nieuwe comment voor PBI: {pbi.Name}", member1), Times.Once);
+            slackMock.Verify(n => n.SendNotification("C1", $"Nieuwe comment voor PBI: {pbi.Name}", member1), Times.Once);
 
-            emailMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
-            smsMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
+            emailMock.Verify(n => n.SendNotification("C2", $"Nieuwe comment voor PBI: {pbi.Name}", member1), Times.Once);
+            slackMock.Verify(n => n.SendNotification("C2", $"Nieuwe comment voor PBI: {pbi.Name}", member1), Times.Once);
+        }
 
-            smsMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", authorMember), Times.Once);
-            slackMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", authorMember), Times.Once);
+        // ========================
+        // EDGE CASES
+        // ========================
+
+        [Fact]
+        public void Comment_ShouldNotCrash_WhenNoObservers()
+        {
+            // Arrange
+            var author = new User(1, "Author", "0123456789", "test@test.nl", 1);
+            var dev = new User(2, "Dev", "123", "dev@test.nl", 2);
+
+            var authorMember = new ProjectMember(author, RoleEnum.DEVELOPER);
+            var devMember = new ProjectMember(dev, RoleEnum.DEVELOPER);
+
+            var project = new Project("Test", authorMember);
+            var backlog = new ProjectBacklog(project);
+            var pbi = new BacklogItem("PBI", "Desc", backlog);
+            pbi.ProjectMember = devMember;
+
+            // Act & Assert
+            new SimpleComment("CommentBody", authorMember, pbi);
         }
 
         [Fact]
-        public void CommentCompositeSendNotification_WithActivities_Valid()
+        public void MultipleComments_ShouldTriggerMultipleNotifications()
         {
             // Arrange
-            User author = new(1, "Author", "0123456789", "test@test.nl", 1);
-            User member1 = new(2, "Member1", "416895231", "test@test.nl", 2);
-            User member2 = new(3, "Member2", "416895231", "test@test.nl", 3);
+            var author = new User(1, "Author", "0123456789", "test@test.nl", 1);
+            var dev = new User(2, "Dev", "123", "dev@test.nl", 2);
 
-            ProjectMember authorMember = new(author, RoleEnum.DEVELOPER);
-            ProjectMember projectMember1 = new(member1, RoleEnum.DEVELOPER);
-            ProjectMember projectMember2 = new(member2, RoleEnum.DEVELOPER);
+            var authorMember = new ProjectMember(author, RoleEnum.DEVELOPER);
+            var devMember = new ProjectMember(dev, RoleEnum.DEVELOPER);
 
-            // 👇 mocks i.p.v. echte notificaties
             var emailMock = new Mock<INotificationObserver>();
-            var smsMock = new Mock<INotificationObserver>();
-            var slackMock = new Mock<INotificationObserver>();
+            devMember.AddObserver(emailMock.Object);
 
-            projectMember1.AddObserver(emailMock.Object);
-            projectMember1.AddObserver(slackMock.Object);
-            projectMember2.AddObserver(emailMock.Object);
-            projectMember2.AddObserver(smsMock.Object);
-            authorMember.AddObserver(slackMock.Object);
-            authorMember.AddObserver(smsMock.Object);
-
-            Project project = new("TestProject", authorMember);
-            ProjectBacklog backlog = new(project);
-            BacklogItem backlogItem = new("TestBacklogItem", "TestDescription", backlog);
-            Activity activity = new("Activity", "ActivityDescription", projectMember1);
-
-            backlogItem.AddActivity(activity);
-            backlogItem.ProjectMember = projectMember2;
+            var project = new Project("Test", authorMember);
+            var backlog = new ProjectBacklog(project);
+            var pbi = new BacklogItem("PBI", "Desc", backlog);
+            pbi.ProjectMember = devMember;
 
             // Act
-            CommentComposite CommentComposite1 = new("CommentBody1", authorMember, backlogItem, null);
-            CommentComposite CommentComposite2 = new("CommentBody2", projectMember1, backlogItem, CommentComposite1);
+            new SimpleComment("C1", authorMember, pbi);
+            new SimpleComment("C2", authorMember, pbi);
 
             // Assert
-            emailMock.Verify(n => n.SendNotification("CommentBody1", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
-            smsMock.Verify(n => n.SendNotification("CommentBody1", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
-
-            emailMock.Verify(n => n.SendNotification("CommentBody1", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
-            slackMock.Verify(n => n.SendNotification("CommentBody1", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
-
-            emailMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
-            smsMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember2), Times.Once);
-
-            emailMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
-            slackMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", projectMember1), Times.Once);
-
-            smsMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", authorMember), Times.Once);
-            slackMock.Verify(n => n.SendNotification("CommentBody2", $"Nieuwe comment voor PBI: {backlogItem.Name}", authorMember), Times.Once);
+            emailMock.Verify(n => n.SendNotification("C1", $"Nieuwe comment voor PBI: {pbi.Name}", devMember), Times.Once);
+            emailMock.Verify(n => n.SendNotification("C2", $"Nieuwe comment voor PBI: {pbi.Name}", devMember), Times.Once);
         }
     }
 }

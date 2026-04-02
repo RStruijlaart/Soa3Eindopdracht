@@ -1,4 +1,5 @@
-﻿using Soa3Eindopdracht.Domain;
+﻿using Moq;
+using Soa3Eindopdracht.Domain;
 using Soa3Eindopdracht.Domain.Git;
 using Soa3Eindopdracht.Domain.Projects;
 using Soa3Eindopdracht.Domain.Sprints;
@@ -6,87 +7,89 @@ using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class GitTests
+    public class GitTests : BaseTest
     {
-        private Project CreateProject()
+        private readonly Project _project;
+        private readonly Sprint _sprint;
+
+        public GitTests() : base()
         {
-            var user = new User(1, "Tester", "123", "test@test.com", 1);
+            // Setup basis context voor Git acties
+            var user = new User(1, "Dev", "123", "dev@test.nl", 1);
             var member = new ProjectMember(user, RoleEnum.DEVELOPER);
-            return new Project("Test project", member);
+            _project = new Project("DevOps", member);
+            _sprint = new ReviewSprint("Sprint 1", DateTime.Now, DateTime.Now.AddDays(7), _project);
         }
 
-        // ========================
-        // GitRepository
-        // ========================
+        // ============================================================
+        // FR-9.1: REPOSITORY & BRANCH MANAGEMENT
+        // ============================================================
 
         [Fact]
-        public void CreateBranch_AddsBranchToRepository()
+        public void GitRepository_ShouldManageMultipleBranches_FR9_1()
         {
-            var repo = new GitRepository();
+            // Arrange
+            var repo = _project.Repository;
 
-            var branch = repo.CreateBranch("develop");
+            // Act
+            var master = repo.CreateBranch("master");
+            var feature = repo.CreateBranch("feature-login");
 
-            Assert.Contains(branch, repo.Branches);
-            Assert.Equal("develop", branch.Name);
-        }
-
-        // ========================
-        // Branch
-        // ========================
-
-        [Fact]
-        public void Branch_AddCommit_AddsCommitToList()
-        {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
-
-            var branch = new Branch("feature");
-            var commit = new Commit("Initial commit", sprint);
-
-            branch.AddCommit(commit);
-
-            Assert.Contains(commit, branch.Commits);
-        }
-
-        // ========================
-        // Commit
-        // ========================
-
-        [Fact]
-        public void Commit_StoresMessageAndSprint()
-        {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
-
-            var commit = new Commit("Fix bug", sprint);
-
-            Assert.Equal("Fix bug", commit.Message);
-            Assert.Equal(sprint, commit.Sprint);
+            // Assert
+            Assert.Equal(2, repo.Branches.Count);
+            Assert.Contains(repo.Branches, b => b.Name == "master");
+            Assert.Contains(repo.Branches, b => b.Name == "feature-login");
         }
 
         [Fact]
-        public void Commit_EmptyMessage_ThrowsException()
+        public void Branch_ShouldThrowException_OnEmptyName()
         {
-            var project = CreateProject();
-            var sprint = new ReviewSprint("Sprint", DateTime.Now, DateTime.Now.AddDays(1), project);
-
-            Assert.Throws<ArgumentException>(() => new Commit("", sprint));
-        }
-
-        [Fact]
-        public void Branch_EmptyName_ThrowsException()
-        {
+            // Act & Assert
             Assert.Throws<ArgumentException>(() => new Branch(""));
         }
+
+        // ============================================================
+        // FR-9.2: COMMITS & TRACEABILITY
+        // ============================================================
+
         [Fact]
-        public void Repository_CanContainMultipleBranches()
+        public void Commit_ShouldBeLinkedToASprint_FR9_2()
         {
-            var repo = new GitRepository();
+            // Arrange
+            var branch = new Branch("main");
+            var commitMessage = "Initial commit voor sprint 1";
 
-            var b1 = repo.CreateBranch("main");
-            var b2 = repo.CreateBranch("dev");
+            // Act
+            var commit = new Commit(commitMessage, _sprint);
+            branch.AddCommit(commit);
 
-            Assert.Equal(2, repo.Branches.Count);
+            // Assert
+            Assert.Equal(_sprint, commit.Sprint);
+            Assert.Contains(commit, branch.Commits);
+            Assert.True(commit.Timestamp <= DateTime.Now);
+        }
+
+        [Fact]
+        public void Commit_ShouldThrowException_OnEmptyMessage()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => new Commit("", _sprint));
+        }
+
+        [Fact]
+        public void Branch_ShouldAllowAddingMultipleCommits()
+        {
+            // Arrange
+            var branch = new Branch("develop");
+            var c1 = new Commit("Update 1", _sprint);
+            var c2 = new Commit("Update 2", _sprint);
+
+            // Act
+            branch.AddCommit(c1);
+            branch.AddCommit(c2);
+
+            // Assert
+            Assert.Equal(2, branch.Commits.Count);
         }
     }
 }
