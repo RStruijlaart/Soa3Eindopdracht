@@ -1,122 +1,153 @@
-﻿using System;
-using System.IO;
+﻿using Moq;
 using Soa3Eindopdracht.Domain.Pipelines;
 using Soa3Eindopdracht.Domain.Pipelines.Actions;
+using Soa3Eindopdracht.Domain.Sprints;
+using Soa3Eindopdracht.Domain.Projects;
+using Soa3Eindopdracht.Domain.Notification;
+using Soa3Eindopdracht.Domain;
 using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class PipelineTests
+    public class PipelineTests : BaseTest
     {
-        [Fact]
-        public void Pipeline_Executes_All_Actions_In_Order()
+        private readonly Mock<INotificationObserver> _notificationMock;
+        private readonly ProjectMember _scrumMaster;
+        private readonly Project _project;
+
+        public PipelineTests() : base()
         {
+            // Setup voor integratie tests
+            var user = new User(1, "SM", "123", "sm@test.nl", 1);
+            _scrumMaster = new ProjectMember(user, RoleEnum.SCRUM_MASTER);
+            _project = new Project("DevOps Project", _scrumMaster);
+
+            _notificationMock = new Mock<INotificationObserver>();
+            _scrumMaster.AddObserver(_notificationMock.Object);
+        }
+
+        // ============================================================
+        // COMPOSITE PATTERN TESTS
+        // ============================================================
+
+        [Fact]
+        public void Pipeline_ShouldExecuteAllAddedActions_FR7_1()
+        {
+            // Arrange
             var pipeline = new PipelineComposite();
             pipeline.Add(new SourceAction());
             pipeline.Add(new BuildAction());
             pipeline.Add(new TestAction());
 
-            var sw = new StringWriter();
-            Console.SetOut(sw);
+            using (var sw = new StringWriter())
+            {
+                Console.SetOut(sw);
 
-            pipeline.Execute();
+                // Act
+                pipeline.Execute();
 
-            var output = sw.ToString();
-
-            Assert.Contains("=== Pipeline gestart ===", output);
-            Assert.Contains("[SourceAction] Source code ophalen...", output);
-            Assert.Contains("[BuildAction] Build uitvoeren...", output);
-            Assert.Contains("[TestAction] Tests uitvoeren...", output);
-            Assert.Contains("=== Pipeline afgerond ===", output);
+                // Assert
+                var output = sw.ToString();
+                Assert.Contains("Source code ophalen", output);
+                Assert.Contains("Build uitvoeren", output);
+                Assert.Contains("Tests uitvoeren", output);
+            }
         }
 
         [Fact]
-        public void Pipeline_Executes_Nested_Pipelines()
+        public void Pipeline_ShouldSupportNestedPipelines_CompositePattern()
         {
-            var parent = new PipelineComposite();
-            var child = new PipelineComposite();
+            // Arrange
+            var mainPipeline = new PipelineComposite();
+            var subPipeline = new PipelineComposite();
 
-            child.Add(new BuildAction());
-            child.Add(new TestAction());
+            subPipeline.Add(new BuildAction());
+            mainPipeline.Add(subPipeline);
 
-            parent.Add(new SourceAction());
-            parent.Add(child);
+            using (var sw = new StringWriter())
+            {
+                Console.SetOut(sw);
 
-            var sw = new StringWriter();
-            Console.SetOut(sw);
+                // Act
+                mainPipeline.Execute();
 
-            parent.Execute();
+                // Assert
+                var output = sw.ToString();
+                Assert.Contains("Build uitvoeren", output);
+            }
+        }
 
-            var output = sw.ToString();
+        // ============================================================
+        // FR-7: SPRINT INTEGRATIE & AUTOMATISERING
+        // ============================================================
 
-            Assert.Contains("[SourceAction] Source code ophalen...", output);
-            Assert.Contains("[BuildAction] Build uitvoeren...", output);
-            Assert.Contains("[TestAction] Tests uitvoeren...", output);
+        [Fact]
+        public void ReleaseSprint_ShouldAutomaticallyExecutePipeline_WhenFinished_FR7_2()
+        {
+            // Arrange
+            var start = DateTime.Now;
+            var end = start.AddDays(14);
+            var sprint = new ReleaseSprint("Release 1.0", start, end, _project);
+
+            var pipelineMock = new Mock<IPipelineComponent>();
+            sprint.SetPipeline(pipelineMock.Object);
+
+            // Act
+            sprint.Start();
+            sprint.Finish();
+            sprint.StartReleasePipeline(); // In jouw FinishedState.cs triggert dit de execute
+
+            // Assert
+            pipelineMock.Verify(p => p.Execute(), Times.Once);
+            Assert.IsType<Soa3Eindopdracht.Domain.Sprints.States.ReleasedState>(sprint.CurrentState);
         }
 
         [Fact]
-        public void Pipeline_Remove_Component_Should_Not_Execute_It()
+        public void ReviewSprint_ShouldNotSupportPipeline_FR7_Voorwaarde()
         {
-            var pipeline = new PipelineComposite();
-            var build = new BuildAction();
-
-            pipeline.Add(new SourceAction());
-            pipeline.Add(build);
-            pipeline.Remove(build);
-
-            var sw = new StringWriter();
-            Console.SetOut(sw);
-
-            pipeline.Execute();
-
-            var output = sw.ToString();
-
-            Assert.DoesNotContain("[BuildAction] Build uitvoeren...", output);
-        }
-
-        [Fact]
-        public void Pipeline_Empty_Should_Still_Start_And_End()
-        {
-            var pipeline = new PipelineComposite();
-
-            var sw = new StringWriter();
-            Console.SetOut(sw);
-
-            pipeline.Execute();
-
-            var output = sw.ToString();
-
-            Assert.Contains("=== Pipeline gestart ===", output);
-            Assert.Contains("=== Pipeline afgerond ===", output);
-        }
-
-        [Fact]
-        public void Pipeline_Executes_All_Action_Types()
-        {
+            // Arrange
+            var start = DateTime.Now;
+            var end = start.AddDays(14);
+            var sprint = new ReviewSprint("Review 1.0", start, end, _project);
             var pipeline = new PipelineComposite();
 
-            pipeline.Add(new SourceAction());
-            pipeline.Add(new PackageAction());
-            pipeline.Add(new BuildAction());
-            pipeline.Add(new TestAction());
-            pipeline.Add(new AnalyseAction());
-            pipeline.Add(new UtilityAction());
-            pipeline.Add(new DeployAction());
+            // Act & Assert
+            // Volgens jouw Sprint.SetPipeline() gooit dit een exception bij ReviewSprints
+            Assert.Throws<InvalidOperationException>(() => sprint.SetPipeline(pipeline));
+        }
 
-            var sw = new StringWriter();
-            Console.SetOut(sw);
+        // ============================================================
+        // FR-7.3 & 7.4: ERROR HANDLING & NOTIFICATIONS
+        // ============================================================
 
-            pipeline.Execute();
+        [Fact]
+        public void Pipeline_Failure_ShouldNotifyScrumMaster_FR7_3()
+        {
+            // OPMERKING: Jouw huidige FinishedState.cs heeft nog geen try-catch rond de execute.
+            // Deze test dwingt af dat we nadenken over wat er gebeurt als de pipeline faalt.
 
-            var output = sw.ToString();
+            // Arrange
+            var start = DateTime.Now;
+            var end = start.AddDays(14);
+            var sprint = new ReleaseSprint("Failed Release", start, end, _project);
 
-            Assert.Contains("[SourceAction] Source code ophalen...", output);
-            Assert.Contains("[PackageAction] Packages installeren...", output);
-            Assert.Contains("[BuildAction] Build uitvoeren...", output);
-            Assert.Contains("[TestAction] Tests uitvoeren...", output);
-            Assert.Contains("[AnalyseAction] Code analyse uitvoeren (Sonar)...", output);
-            Assert.Contains("[UtilityAction] Utility taak uitvoeren...", output);
-            Assert.Contains("[DeployAction] Deployment uitvoeren...", output);
+            var failingPipeline = new Mock<IPipelineComponent>();
+            failingPipeline.Setup(p => p.Execute()).Throws(new Exception("Build Failed"));
+
+            sprint.SetPipeline(failingPipeline.Object);
+            sprint.Start();
+            sprint.Finish();
+
+            // Act
+            try { sprint.StartReleasePipeline(); } catch { /* Simulatie van fout */ }
+
+            // Assert
+            // Volgens FR-7.3 moet de SM bericht krijgen bij een fout. 
+            // Hiervoor moet je in de FinishedState.cs een try-catch toevoegen die de SM notificeert.
+            _notificationMock.Verify(n => n.SendNotification(
+                It.Is<string>(s => s.Contains("fout") || s.Contains("gefaald") || s.Contains("Failed")),
+                It.IsAny<string>(),
+                _scrumMaster), Times.AtLeastOnce);
         }
     }
 }

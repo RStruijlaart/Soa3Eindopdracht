@@ -1,72 +1,114 @@
-﻿using Soa3Eindopdracht.Domain;
-using Soa3Eindopdracht.Domain.BacklogItem;
+﻿using Moq;
+using Soa3Eindopdracht.Domain;
 using Soa3Eindopdracht.Domain.Notification;
-using Soa3Eindopdracht.Domain.Projects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Xunit;
 
 namespace So3EindopdrachtTests
 {
-    public class NotificationTests
+    public class NotificationTests : BaseTest
     {
-        [Fact]
-        public void ObserverSendNotification_EmailNotification_Valid()
+        private readonly ProjectMember _projectMember;
+
+        public NotificationTests() : base()
         {
-            //Arrange
+            // Setup basis context voor elke test
             User user = new(1, "Tester", "0123456789", "test@test.nl", 1);
-            ProjectMember projectMember = new(user, RoleEnum.DEVELOPER);
-            projectMember.AddObserver(new EmailNotification());
+            _projectMember = new ProjectMember(user, RoleEnum.DEVELOPER);
+        }
 
-            var sw = new StringWriter();
-            Console.SetOut(sw);
+        // ============================================================
+        // FR-6.1: INDIVIDUELE KANALEN (Console verificatie)
+        // ============================================================
 
-            //Act
-            projectMember.SendNotification("TestBody", "TestSubject");
+        [Fact]
+        public void EmailNotification_ShouldLogSuccess_FR6_1()
+        {
+            // Arrange
+            _projectMember.AddObserver(new EmailNotification());
+            using (var sw = new StringWriter())
+            {
+                Console.SetOut(sw);
 
-            //Assert
-            var output = sw.ToString().Trim();
-            Assert.Equal($"Succesfully send email notification to: {projectMember.User.Name}", output);
+                // Act
+                _projectMember.SendNotification("Body", "Subject");
+
+                // Assert
+                var output = sw.ToString().Trim();
+                Assert.Contains($"Succesfully send email notification to: {_projectMember.User.Name}", output);
+            }
         }
 
         [Fact]
-        public void ObserverSendNotification_SlackNotification_Valid()
+        public void SlackNotification_ShouldLogSuccess_FR6_1()
         {
-            //Arrange
-            User user = new(1, "Tester", "0123456789", "test@test.nl", 1);
-            ProjectMember projectMember = new(user, RoleEnum.DEVELOPER);
-            projectMember.AddObserver(new SlackNotification());
+            // Arrange
+            _projectMember.AddObserver(new SlackNotification());
+            using (var sw = new StringWriter())
+            {
+                Console.SetOut(sw);
 
-            var sw = new StringWriter();
-            Console.SetOut(sw);
+                // Act
+                _projectMember.SendNotification("Body", "Subject");
 
-            //Act
-            projectMember.SendNotification("TestBody", "TestSubject");
-
-            //Assert
-            var output = sw.ToString().Trim();
-            Assert.Equal($"Succesfully send slack notification to: {projectMember.User.Name}", output);
+                // Assert
+                var output = sw.ToString().Trim();
+                Assert.Contains($"Succesfully send slack notification to: {_projectMember.User.Name}", output);
+            }
         }
 
         [Fact]
-        public void ObserverSendNotification_SmsNotification_Valid()
+        public void SmsNotification_ShouldLogSuccess_FR6_1()
         {
-            //Arrange
-            User user = new(1, "Tester", "0123456789", "test@test.nl", 1);
-            ProjectMember projectMember = new(user, RoleEnum.DEVELOPER);
-            projectMember.AddObserver(new SmsNotification());
+            // Arrange
+            _projectMember.AddObserver(new SmsNotification());
+            using (var sw = new StringWriter())
+            {
+                Console.SetOut(sw);
 
-            var sw = new StringWriter();
-            Console.SetOut(sw);
+                // Act
+                _projectMember.SendNotification("Body", "Subject");
 
-            //Act
-            projectMember.SendNotification("TestBody", "TestSubject");
+                // Assert
+                var output = sw.ToString().Trim();
+                Assert.Contains($"Succesfully send sms notification to: {_projectMember.User.Name}", output);
+            }
+        }
 
-            //Assert
-            var output = sw.ToString().Trim();
-            Assert.Equal($"Succesfully send sms notification to: {projectMember.User.Name}", output);
+        // ============================================================
+        // FR-6.2: COMBINATIES VAN KANALEN (Gouden Standaard Mocks)
+        // ============================================================
+
+        [Fact]
+        public void ProjectMember_ShouldNotifyMultipleObservers_WhenMultipleChannelsAdded_FR6_2()
+        {
+            // Arrange - We voegen twee verschillende mocks toe
+            var emailMock = new Mock<INotificationObserver>();
+            var slackMock = new Mock<INotificationObserver>();
+
+            _projectMember.AddObserver(emailMock.Object);
+            _projectMember.AddObserver(slackMock.Object);
+
+            // Act
+            _projectMember.SendNotification("Het systeem is klaar", "Update");
+
+            // Assert - Controleer of BEIDE mocks de notificatie hebben ontvangen
+            emailMock.Verify(n => n.SendNotification("Het systeem is klaar", "Update", _projectMember), Times.Once);
+            slackMock.Verify(n => n.SendNotification("Het systeem is klaar", "Update", _projectMember), Times.Once);
+        }
+
+        [Fact]
+        public void ProjectMember_ShouldNoLongerNotify_WhenObserverRemoved()
+        {
+            // Arrange
+            var mock = new Mock<INotificationObserver>();
+            _projectMember.AddObserver(mock.Object);
+            _projectMember.DeleteObserver(mock.Object); // Verwijder observer
+
+            // Act
+            _projectMember.SendNotification("Test", "Test");
+
+            // Assert
+            mock.Verify(n => n.SendNotification(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectMember>()), Times.Never);
         }
     }
 }

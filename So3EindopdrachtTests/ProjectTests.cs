@@ -1,94 +1,123 @@
-﻿using Soa3Eindopdracht.Domain;
+﻿using Moq;
+using Soa3Eindopdracht.Domain;
 using Soa3Eindopdracht.Domain.Projects;
+using Soa3Eindopdracht.Domain.Sprints;
+using Xunit;
 
 namespace So3EindopdrachtTests
 {
     public class ProjectTests
     {
-        private User CreateUser(string name = "Tester")
+        private User CreateUser(string name = "Tester", int id = 1)
         {
-            return new User(1, name, "123", "test@test.com", 1);
+            return new User(id, name, "123", "test@test.com", id);
         }
 
+        // ============================================================
+        // FR-1: PROJECT CREATIE & BACKLOG
+        // ============================================================
+
         [Fact]
-        public void Project_Creation_Valid()
+        public void Project_Creation_ShouldInitializeCorrectly_FR1()
         {
+            // Arrange
             var user = CreateUser();
             var member = new ProjectMember(user, RoleEnum.DEVELOPER);
 
-            var project = new Project("Test Project", member);
+            // Act
+            var project = new Project("Avans DevOps", member);
 
-            Assert.Equal("Test Project", project.Name);
+            // Assert
+            Assert.Equal("Avans DevOps", project.Name);
             Assert.NotNull(project.Backlog);
             Assert.NotNull(project.Repository);
-            Assert.Single(project.Developers);
+            Assert.Contains(member, project.Developers);
         }
 
         [Fact]
-        public void Project_Creation_InvalidName()
+        public void Project_ShouldThrowException_OnEmptyName_FR1_Voorwaarde()
         {
-            var user = CreateUser();
-            var member = new ProjectMember(user, RoleEnum.DEVELOPER);
+            // Arrange
+            var member = new ProjectMember(CreateUser(), RoleEnum.DEVELOPER);
 
+            // Act & Assert
             Assert.Throws<ArgumentException>(() => new Project("", member));
         }
 
+        // ============================================================
+        // FR-10: ROLLEN & AUTORISATIE
+        // ============================================================
+
         [Fact]
-        public void AddProjectMember_Developer()
+        public void Project_ShouldAssignScrumMaster_WhenRoleMatches_FR10_4()
         {
-            var project = new Project("Test", new ProjectMember(CreateUser(), RoleEnum.DEVELOPER));
+            // Arrange
+            var creator = new ProjectMember(CreateUser("Creator"), RoleEnum.DEVELOPER);
+            var project = new Project("Test", creator);
+            var smMember = new ProjectMember(CreateUser("SM"), RoleEnum.SCRUM_MASTER);
 
-            var dev = new ProjectMember(CreateUser("Dev2"), RoleEnum.DEVELOPER);
-            project.AddProjectMember(dev);
+            // Act
+            project.AddProjectMember(smMember);
 
-            Assert.Equal(2, project.Developers.Count);
+            // Assert
+            // Let op: Je domeincode heeft hier een bug (if ScrumMaster != null). 
+            // Deze test dwingt af dat de SM ook echt gezet wordt!
+            Assert.Equal(smMember, project.ScrumMaster);
         }
 
         [Fact]
-        public void AddProjectMember_Tester()
+        public void Project_ShouldAssignProductOwner_WhenRoleMatches_FR10_4()
         {
-            var project = new Project("Test", new ProjectMember(CreateUser(), RoleEnum.DEVELOPER));
+            // Arrange
+            var creator = new ProjectMember(CreateUser("Creator"), RoleEnum.DEVELOPER);
+            var project = new Project("Test", creator);
+            var poMember = new ProjectMember(CreateUser("PO"), RoleEnum.PRODUCT_OWNER);
 
-            var tester = new ProjectMember(CreateUser("Tester2"), RoleEnum.TESTER);
-            project.AddProjectMember(tester);
+            // Act
+            project.AddProjectMember(poMember);
 
-            Assert.Single(project.Testers);
+            // Assert
+            // Ook hier dwingt de test de correcte werking van de bug in je domeincode af.
+            Assert.Equal(poMember, project.ProductOwner);
         }
 
         [Fact]
-        public void AddProjectMember_ScrumMaster_FirstTime_Invalid()
+        public void Project_ShouldSupportMultipleTesters_FR10_4()
         {
+            // Arrange
             var project = new Project("Test", new ProjectMember(CreateUser(), RoleEnum.DEVELOPER));
+            var tester1 = new ProjectMember(CreateUser("T1", 2), RoleEnum.TESTER);
+            var tester2 = new ProjectMember(CreateUser("T2", 3), RoleEnum.TESTER);
 
-            var sm = new ProjectMember(CreateUser("SM"), RoleEnum.SCRUM_MASTER);
-            project.AddProjectMember(sm);
+            // Act
+            project.AddProjectMember(tester1);
+            project.AddProjectMember(tester2);
 
-            // jouw code: eerste keer wordt NIET gezet (bug eigenlijk)
-            Assert.Null(project.ScrumMaster);
+            // Assert
+            Assert.Equal(2, project.Testers.Count);
+            Assert.Contains(tester1, project.Testers);
+            Assert.Contains(tester2, project.Testers);
         }
 
-        [Fact]
-        public void AddProjectMember_ProductOwner_FirstTime_Invalid()
-        {
-            var project = new Project("Test", new ProjectMember(CreateUser(), RoleEnum.DEVELOPER));
-
-            var po = new ProjectMember(CreateUser("PO"), RoleEnum.PRODUCT_OWNER);
-            project.AddProjectMember(po);
-
-            Assert.Null(project.ProductOwner);
-        }
+        // ============================================================
+        // SPRINT MANAGEMENT
+        // ============================================================
 
         [Fact]
-        public void AddSprint_And_RemoveSprint()
+        public void Project_ShouldManageSprintsCorrectly()
         {
+            // Arrange
             var project = new Project("Test", new ProjectMember(CreateUser(), RoleEnum.DEVELOPER));
+            // We gebruiken een echte ReviewSprint ipv een mock voor een pure domein test
+            var sprint = new ReviewSprint("Sprint 1", DateTime.Now, DateTime.Now.AddDays(7), project);
 
-            var sprint = new MockSprint(project);
-
+            // Act
             project.AddSprint(sprint);
             Assert.Single(project.Sprints);
 
             project.RemoveSprint(sprint);
+
+            // Assert
             Assert.Empty(project.Sprints);
         }
     }
