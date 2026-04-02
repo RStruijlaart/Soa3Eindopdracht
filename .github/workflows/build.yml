@@ -45,9 +45,9 @@ jobs:
           ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"RStruijlaart_Soa3Eindopdracht" /o:"rstruijlaart" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.cs.opencover.reportsPaths=coverage.xml
 
           dotnet build --no-incremental
-          dotnet test --no-build --verbosity normal
           dotnet tool restore
           dotnet coverlet So3EindopdrachtTests\bin\Debug\net8.0\So3EindopdrachtTests.dll --target "dotnet" --targetargs "test So3EindopdrachtTests/So3EindopdrachtTests.csproj --no-build" -f=opencover -o="coverage.xml"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end `
             /d:sonar.token="$env:SONAR_TOKEN"
