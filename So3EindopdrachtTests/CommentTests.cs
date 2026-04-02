@@ -172,17 +172,16 @@ namespace So3EindopdrachtTests
             // Arrange
             var author = new User(1, "Author", "0123456789", "test@test.nl", 1);
             var dev = new User(2, "Dev", "123", "dev@test.nl", 2);
-
             var authorMember = new ProjectMember(author, RoleEnum.DEVELOPER);
             var devMember = new ProjectMember(dev, RoleEnum.DEVELOPER);
-
             var project = new Project("Test", authorMember);
             var backlog = new ProjectBacklog(project);
             var pbi = new BacklogItem("PBI", "Desc", backlog);
             pbi.ProjectMember = devMember;
-
-            // Act & Assert
-            new SimpleComment("CommentBody", authorMember, pbi);
+            // Act
+            var exception = Record.Exception(() => new SimpleComment("CommentBody", authorMember, pbi));
+            // Assert
+            Assert.Null(exception);
         }
 
         [Fact]
