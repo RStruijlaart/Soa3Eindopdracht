@@ -18,7 +18,7 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
         public void SetActive() => Invalid("Kan niet terug naar Active.");
         public void SetFinished() => Invalid("Sprint is al finished.");
 
-        // 🔥 PIPELINE LOGICA
+        // PIPELINE LOGICA
         public void StartReleasePipeline()
         {
             if (!_sprint.IsReleaseSprint())
@@ -32,6 +32,7 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
                 Invalid("Geen pipeline gekoppeld.");
                 return;
             }
+
             try
             {
                 Console.WriteLine("Pipeline wordt uitgevoerd...");
@@ -52,11 +53,6 @@ namespace Soa3Eindopdracht.Domain.Sprints.States
                 Console.WriteLine($"Fout: Pipeline uitvoering gefaald. Scrum Master is op de hoogte gesteld.");
             }
 
-            Console.WriteLine("Pipeline wordt uitgevoerd...");
-
-            _sprint.Pipeline.Execute();
-
-            SetReleased();
         }
 
         public void SetReleased()
